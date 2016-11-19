@@ -10,7 +10,7 @@ before_script:
 deploy:
   script:
     # - npm run build
-    - git push git@45.32.242.245:/opt/git/uqpp-api-server.git
+    - git push git@45.32.242.245:/opt/git/uqpp-api-server.git master
   
   only:
     - master
