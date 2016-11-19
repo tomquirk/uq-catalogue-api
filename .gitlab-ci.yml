@@ -1,4 +1,4 @@
-image: node:6.9
+#image: node:6.9
 
 # cache:
 #   paths:
@@ -10,7 +10,7 @@ before_script:
 deploy:
   script:
     # - npm run build
-    - git push prod master
+    - git push git@45.32.242.245:/opt/git/uqpp-api-server.git
   
   only:
     - master
