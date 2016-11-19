@@ -8,6 +8,8 @@ var rest = require('./REST.js');
 var app = express();
 var path = require('path');
 
+var debug = require('./log').debug;
+
 process.env.NODE_ENV = 'dev';
 
 function REST() {
@@ -27,6 +29,7 @@ REST.prototype.connectMysql = function () {
   });
   pool.getConnection(function (err, connection) {
     if (err) {
+      debug(err);
       self.stop(err);
     } else {
       self.configureExpress(connection);
@@ -44,8 +47,8 @@ REST.prototype.configureExpress = function (connection) {
   app.use(express.static(path.join(__dirname, 'dist')));
 
   app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
   });
 
@@ -55,19 +58,20 @@ REST.prototype.configureExpress = function (connection) {
   var rest_router = new rest(router, connection, md5);
 
   self.startServer();
-
 }
 
 REST.prototype.startServer = function () {
   var server = http.createServer(app)
   reload(server, app)
   app.listen(app.get('port'), function () {
-    console.log("Listening on port " + app.get('port'));
+    debug('Setup SUCCESSFUL');
+    console.log('Listening on port ' + app.get('port'));
   });
 }
 
 REST.prototype.stop = function (err) {
-  console.log("ISSUE WITH MYSQL n" + err);
+  debug('ISSUE WITH MYSQL:', err);
+  console.log('ISSUE WITH MYSQL:',err);
   process.exit(1);
 }
 

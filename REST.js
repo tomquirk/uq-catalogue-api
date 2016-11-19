@@ -38,9 +38,12 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
     // });
   });
 
+  /*
+  Returns data for a single program
+  */
   router.get('/program/:program_code', function (req, res) {
     if (/[0-9]/.test(req.params.program_code) && req.params.program_code.length != 4) {
-      res.status(404).json({ "message": "Invalid program" });
+      res.status(404).json({ 'message': 'Invalid program' });
     }
 
     function program() {
@@ -117,8 +120,9 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
   */
   router.get('/plan/:plan_code', function (req, res) {
     if (/^\w+$/.test(req.params.program_code) && req.params.program_code.length != 10) {
-      res.status(404).json({ "message": "Invalid plan" });
+      res.status(404).json({ 'message': 'Invalid plan' });
     }
+
     function plan() {
       var defered = Q.defer();
       var query = 'SELECT * FROM Plan where plan_code = ?';
