@@ -10,7 +10,8 @@ var path = require('path');
 
 var debug = require('./log').debug;
 
-process.env.NODE_ENV = 'dev';
+process.env.PORT = process.env.NODE_ENV == "dev" ? 3000 : 80;
+
 
 function REST() {
   var self = this;
@@ -23,7 +24,7 @@ REST.prototype.connectMysql = function () {
     connectionLimit: 100,
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: process.env.NODE_ENV == "dev" ? '' : 'Evyh41?Irqds55',
     database: 'uq_catalogue',
     debug: false
   });
