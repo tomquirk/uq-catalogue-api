@@ -1,47 +1,22 @@
 var mysql = require('mysql');
 var _ = require('lodash');
 var Q = require('q');
-// var nodemailer = require('nodemailer');
 
 function REST_ROUTER(router, connection, md5) {
   var self = this;
   self.handleRoutes(router, connection, md5);
 }
 
-REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
+REST_ROUTER.prototype.handleRoutes = function(router, connection, md5) {
 
-  router.get('/', function (req, res) {
+  router.get('/', function(req, res) {
     res.status(204).send('');
-  });
-
-  router.get('/contact', function (req, res) {
-    console.log(req)
-
-    // // create reusable transporter object using the default SMTP transport
-    // var transporter = nodemailer.createTransport('smtps://user%40gmail.com:pass@smtp.gmail.com');
-
-    // // setup e-mail data with unicode symbols
-    // var mailOptions = {
-    //   from: '"Fred Foo 👥" <foo@blurdybloop.com>', // sender address
-    //   to: 'bar@blurdybloop.com, baz@blurdybloop.com', // list of receivers
-    //   subject: 'Hello ✔', // Subject line
-    //   text: 'Hello world 🐴', // plaintext body
-    //   html: '<b>Hello world 🐴</b>' // html body
-    // };
-
-    // // send mail with defined transport object
-    // transporter.sendMail(mailOptions, function (error, info) {
-    //   if (error) {
-    //     return console.log(error);
-    //   }
-    //   console.log('Message sent: ' + info.response);
-    // });
   });
 
   /*
   Returns data for a single program
   */
-  router.get('/program/:program_code', function (req, res) {
+  router.get('/program/:program_code', function(req, res) {
     // if (/[0-9]/.test(req.params.program_code) && req.params.program_code.length != 4) {
     //   res.status(404).json({ 'message': 'Invalid program' });
     // }
@@ -64,7 +39,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
       return defered.promise;
     }
 
-    Q.all([program(), program_plan_list()]).then(function (results) {
+    Q.all([program(), program_plan_list()]).then(function(results) {
       if (results[0][0].length === 0) {
         res.status(404).json({ "message": "Program not found" });
       }
@@ -77,7 +52,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
   /*
   Returns data for a single course
   */
-  router.get('/course/:course_code', function (req, res) {
+  router.get('/course/:course_code', function(req, res) {
     // if (/^\w+$/.test(req.params.program_code) && req.params.program_code.length != 8) {
     //   res.status(404).json({ "message": "Invalid course" });
     // }
@@ -100,7 +75,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
       return defered.promise;
     }
 
-    Q.all([course(), semesters()]).then(function (results) {
+    Q.all([course(), semesters()]).then(function(results) {
       if (req.params.course_code === 'MEME9000') {
         res.status(418).json({ "message": "Blaze it" });
       } else if (results[0][0].length === 0) {
@@ -109,7 +84,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
       var data = results[0][0][0];
       //get semester offerings
       data.semester_offerings = []
-      _.each(results[1][0], function (sem) {
+      _.each(results[1][0], function(sem) {
         data.semester_offerings.push(sem.semester_offering)
       })
       res.json(data);
@@ -119,7 +94,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
   /*
   Returns data for a plan (major)
   */
-  router.get('/plan/:plan_code', function (req, res) {
+  router.get('/plan/:plan_code', function(req, res) {
     // if (/^\w+$/.test(req.params.program_code) && req.params.program_code.length != 10) {
     //   res.status(404).json({ 'message': 'Invalid plan' });
     // }
@@ -151,7 +126,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
       return defered.promise;
     }
 
-    Q.all([plan(), plan_course_list(), course_semester_offerings()]).then(function (results) {
+    Q.all([plan(), plan_course_list(), course_semester_offerings()]).then(function(results) {
       if (results[0][0].length === 0) {
         res.status(404).json({ "message": "Plan not found." });
       }
@@ -159,9 +134,9 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, md5) {
       data.course_list = results[1][0];
 
       //get semester offerings
-      _.each(data.course_list, function (course) {
+      _.each(data.course_list, function(course) {
         course.semester_offerings = []
-        _.each(results[2][0], function (sem) {
+        _.each(results[2][0], function(sem) {
           if (sem.course_code === course.course_code) {
             course.semester_offerings.push(sem.semester_offering)
           }

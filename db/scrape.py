@@ -1,9 +1,7 @@
-from bs4 import BeautifulSoup
 import re
-import requests
 import pprint
-import os
-
+import requests
+from bs4 import BeautifulSoup
 
 class Course:
     """

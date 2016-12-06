@@ -1,7 +1,7 @@
 {
-  "name": "uq-program-planner-api-server",
+  "name": "uq-api",
   "version": "1.0.0",
-  "description": "API Server for UQ Program Planner",
+  "description": "Unofficial API for UQ",
   "author": "Tom Quirk",
   "private": true,
   "dependencies": {
@@ -12,7 +12,11 @@
     "md5": "^2.1.0",
     "moment": "^2.16.0",
     "mysql": "^2.12.0",
+    "node-mysql": "^0.4.2",
     "q": "^1.4.1",
     "reload": "^0.7.0"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
