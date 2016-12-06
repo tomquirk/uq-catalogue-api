@@ -3,7 +3,7 @@
 
 
 ## Overview
-This project includes the tools to build the MySql database (web scraper and sql schema) as well as the Web API (currently in Node). 
+This project includes the tools to build the MySql database (web scraper and sql schema) as well as the REST API (currently in Node). 
 
 
 ## Getting Started
@@ -25,6 +25,7 @@ This project includes the tools to build the MySql database (web scraper and sql
 5. Get a coffee, this might take a while...
 
 #### API
+The API will depend on a local (or otherwise) installation of the DB.
 1. In the root dir, `npm install`
 2. `npm start`
 3. Defaults to port `3000` - to test, try hitting `localhost:3000/api/course/csse1001`
