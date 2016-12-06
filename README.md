@@ -27,6 +27,7 @@ This project includes the tools to build the MySql database (web scraper and sql
 #### API
 1. In the root dir, `npm install`
 2. `npm start`
+3. Defaults to port `3000` - to test, try hitting `localhost:3000/api/course/csse1001`
 
 
 ## Contributing
