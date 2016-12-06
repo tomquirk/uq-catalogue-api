@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 var md5 = require('md5');
 var path = require('path');
 
-var api = require('./REST.js');
+var api = require('./api.js');
 
 var app = express();
 var debug = require('./log').debug;
