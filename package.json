@@ -5,18 +5,15 @@
   "author": "Tom Quirk",
   "private": true,
   "dependencies": {
-    "body-parser": "^1.15.0",
-    "express": "^4.13.3",
-    "http": "^0.0.0",
-    "lodash": "^4.11.1",
-    "md5": "^2.1.0",
-    "moment": "^2.16.0",
-    "mysql": "^2.12.0",
-    "node-mysql": "^0.4.2",
-    "q": "^1.4.1",
-    "reload": "^0.7.0"
+    "bluebird": "^3.4.7",
+    "body-parser": "^1.13.3",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.2.0",
+    "express": "^4.13.4",
+    "morgan": "^1.6.1",
+    "pg-promise": "^3.9.1"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./bin/www"
   }
 }

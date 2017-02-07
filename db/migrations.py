@@ -1,18 +1,14 @@
-from scrape import *
-import pymysql
+from scrape import Catalogue
+from db import Db
 
 
-class PostDB:
+class Migrate:
     """
     Builds database (full wipe, no diff)
     """
     def __init__(self):
-        #   MySQL config
-        mysqlUser = input('MYSQL username: ')
-        mysqlPass = input('MYSQL password: ')
-        self._db = pymysql.connect("localhost", mysqlUser, mysqlPass, "uq_catalogue")
-        self._cursor = self._db.cursor()
-
+        self._db = Db()
+        self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
         self._prerequisite_set_count = 0
 
         self._blacklist = ['COMP1500']  # temporary, should be moved to scrape.py
@@ -23,14 +19,14 @@ class PostDB:
         :return: None
         """
         queries = [
-                   'DELETE from Plan_Course_List',
-                   'DELETE from Course_Semester_Offering',
-                   'DELETE from Course', 'DELETE from Plan',
-                   'DELETE from Program'
+            'DELETE from plan_course_list',
+            'DELETE from course_semester_offering',
+            'DELETE from course', 'DELETE from plan',
+            'DELETE from program'
         ]
 
         for sql in queries:
-            self.dbexec(sql)
+            self._db.commit(sql)
 
     def get_state(self):
         """
@@ -44,29 +40,17 @@ class PostDB:
             'courses': []
         }
 
-        sql = 'SELECT * FROM `Plan`'
-
-        self._cursor.execute(sql)
-
-        data = self._cursor.fetchall()
+        data = self._db.select('SELECT * FROM plan')
 
         for row in data:
             state['plans'].append(row[0])
 
-        sql = 'SELECT * FROM `Program`'
-
-        self._cursor.execute(sql)
-
-        data = self._cursor.fetchall()
+        data = self._db.select('SELECT * FROM program')
 
         for row in data:
             state['programs'].append(row[0])
 
-        sql = 'SELECT * FROM `Course`'
-
-        self._cursor.execute(sql)
-
-        data = self._cursor.fetchall()
+        data = self._db.select('SELECT * FROM course')
 
         for row in data:
             state['courses'].append(row[0])
@@ -79,14 +63,12 @@ class PostDB:
         :return: None
         """
         state = self.get_state()
-        file = open('catalogue.txt', 'r')
+        file = open('backup/catalogue.txt', 'r')
         catalogue = file.read()
         if len(catalogue) == 0:
             catalogue = Catalogue.scrape_catalogue(state)
         else:
             catalogue = eval(catalogue)
-
-        pprint.pprint(catalogue)
 
         print("************* INITIALIZED MIGRATIONS *************")
 
@@ -96,7 +78,6 @@ class PostDB:
 
         for course in catalogue['course_list']:
             self.add_course(course)
-
 
         for plan in catalogue['plan_list']:
             self.add_plan(plan)
@@ -109,14 +90,14 @@ class PostDB:
         :param program: Dictionary
         :return:
         """
-        sql = 'INSERT INTO `Program` ' \
-              '(`program_code`, `title`, `level`, `abbreviation`, `durationYears`, `units`) '\
-              'VALUES ("%s", "%s", "%s", "%s", "%d", "%d")' % \
-              (program['program_code'], program['title'],
+        sql = """INSERT INTO program
+              (program_code, title, level, abbreviation, duration_years, units)
+              VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
+              """ % (program['program_code'], program['title'],
                program['level'], program['abbreviation'],
                program['durationYears'], program['units'])
 
-        self.dbexec(sql)
+        self._db.commit(sql)
 
     def add_plan(self, plan):
         """
@@ -124,17 +105,18 @@ class PostDB:
         :param plan: Dictionary
         :return:
         """
-        sql = 'INSERT INTO `Plan` ' \
-              '(`plan_code`, `program_code`, `title`) ' \
-              'VALUES ("%s", "%s", "%s")' % \
-              (plan['plan_code'], plan['program_code'],
+        sql = """INSERT INTO plan
+              (plan_code, program_code, title)
+              VALUES ('%s', '%s', '%s')
+              """ % (plan['plan_code'], plan['program_code'],
                plan['title'])
 
-        self.dbexec(sql)
+
+        self._db.commit(sql)
 
         for course_code in plan['course_list']:
-            if course_code in plan['required_course_list']:
-                isRequired = 1
+            # if course_code in plan['required_course_list']:
+            #     isRequired = 1
             isRequired = 0
             self.add_plan_course_list(plan['plan_code'], course_code, isRequired)
 
@@ -144,15 +126,17 @@ class PostDB:
         :param course: Dictionary
         :return:
         """
-        print("\nADDING: " + course['course_code'] + " to `Course`")
-        sql = 'INSERT INTO `Course` ' \
-              '(`course_code`, `title`, `description`, `raw_prerequisites`,' \
-              ' `units`, `course_profile_id`) VALUES ("%s", "%s", "%s", "%s", "%d", "%s")' % \
-              (course['course_code'], course['title'],
-               course['description'], course['raw_prereqs'],
+        print("\nADDING: " + course['course_code'] + " to Course")
+
+        sql = """INSERT INTO course
+              (course_code, title, description, raw_prerequisites,
+              units, course_profile_id) VALUES ('%s', '%s', '%s', '%s', '%d', '%s')
+              """ % (course['course_code'], course['title'],
+               course['description'].replace("'", "''"), course['raw_prereqs'],
                course['units'], course['course_profile_id'])
 
-        self.dbexec(sql)
+
+        self._db.commit(sql)
         for semester_offering in course['semester_offerings']:
             self.add_course_semester_offering(course['course_code'],
                                               semester_offering)
@@ -166,38 +150,24 @@ class PostDB:
         :return:
         """
 
-        sql = 'INSERT INTO `Course_Semester_Offering` (`course_code`, `semester_offering`) ' \
-              'VALUES ("%s", "%s")' % \
-              (course_code, semester_offering)
+        sql = """INSERT INTO course_semester_offering (course_code, semester_offering)
+              VALUES ('%s', '%s')""" % (course_code, semester_offering)
 
-        self.dbexec(sql)
+        self._db.commit(sql)
 
-    def add_plan_course_list(self, plan_code, course_code):
+    def add_plan_course_list(self, plan_code, course_code, required):
         """
 
         :param plan_code:
         :param course_code:
         :return:
         """
-        sql = 'INSERT INTO `Plan_Course_list` (`course_code`, `plan_code`, `required`) ' \
-              'VALUES ("%s", "%s", "%d")' % \
-              (course_code, plan_code, required)
+        sql = """INSERT INTO plan_course_list (course_code, plan_code, required)
+              VALUES ('%s', '%s', '%d')""" % (course_code, plan_code, required)
 
-        self.dbexec(sql)
+        self._db.commit(sql)
 
-    def dbexec(self, sql_query):
-        """
-        Helper method for executing queries on db via PyMySQL
-        :param sql_query: String, query to be executed
-        :return:
-        """
-        try:
-            self._cursor.execute(sql_query)
-            self._db.commit()
-        except Exception as e:
-            print('ERROR at query:', sql_query)
-            raise e
-
-x = PostDB()
-x.reset()
-x.init_catalogue()
+if __name__ == "__main__":
+    migration = Migrate()
+    migration.reset()
+    migration.init_catalogue()

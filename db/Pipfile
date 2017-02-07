@@ -1,0 +1,8 @@
+[[source]]
+url = "https://pypi.org/"
+verify_ssl = true
+
+[packages]
+beautifulsoup4 = "*"
+psycopg2 = "*"
+requests = "*"

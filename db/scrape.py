@@ -1,6 +1,7 @@
-import re
 import pprint
+import re
 import requests
+import os
 from bs4 import BeautifulSoup
 
 class Course:
@@ -27,7 +28,7 @@ class Course:
         course_details = {
             'course_code': course_code,
             'title': soup.find(id="course-title").get_text()[:-11],
-            'description': soup.find(id="course-summary").get_text().replace('"', ''),
+            'description': soup.find(id="course-summary").get_text().replace('"', '').replace("'","''"),
             'units': int(soup.find(id="course-units").get_text()),
             'semester_offerings': []
         }
@@ -169,7 +170,7 @@ class Program:
             'durationYears': int(soup.find(id="program-domestic-duration").get_text()[0]),
             'units': int(soup.find(id="program-domestic-units").get_text()),
             'major_list': [],
-            'course_list': (open('meta/program_course_list/%s.txt' % program_code, 'r')).read().replace(' ', '').split(',')
+            'course_list': (open('backup/program_course_list/%s.txt' % program_code, 'r')).read().replace(' ', '').split(',')
         }
 
         raw_majors = soup.find_all('a', href=re.compile("acad_plan"))
@@ -341,5 +342,5 @@ class Catalogue:
 
     @staticmethod
     def export(data):
-        file = open('catalogue.txt', 'w')
+        file = open('backup/catalogue.txt', 'w')
         file.write(pprint.pformat(data))

@@ -1,24 +1,23 @@
 # UQ API (unofficial)
-> (Unofficial) API and webscraper for University of Queensland Course and Program Data
+> (Unofficial) webscraper and API for University of Queensland Course and Program Data
 
 
 ## Overview
-This project includes the tools to build the MySql database (web scraper and sql schema) as well as the REST API (currently in Node). 
-
+This project includes the tools to build the PostgreSQL database (web scraper and sql schema) as well as the REST API (currently in Node). 
 
 ## Getting Started
 
 
 ### Prerequisites
 - Node (latest)
-- Python 3.x and virtualenv
-- MySql Server
+- Python 3.x and virtualenv (try pipenv)
+- Postgres Server
 
 
 ### Installation
 
 #### DB/scraper
-1. Create a MySql db named `uq_catalogue` as root user with no pwd (or change config in `migrations.py` desired) and import `uq_catalogue_schema.sql`
+1. Create a PostgreSQL db named `uq_catalogue` as root user with no pwd (or change config in `migrations.py` desired) and import `uq_catalogue_schema.sql`
 2. Setup your virtualenv in python3 - `virtualenv --python=python3 env`- source it and `cd db`
 3. `pip install -r requirements.txt`
 4. `python3 migrations.py` and enter your db details

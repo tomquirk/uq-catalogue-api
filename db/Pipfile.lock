@@ -1,0 +1,18 @@
+{
+    "_meta": {
+        "sources": [
+            {
+                "url": "https://pypi.org/",
+                "verify_ssl": true
+            }
+        ],
+        "requires": {},
+        "Pipfile-sha256": "6b86aca97e2abb754e34e7577a21c11c5939fafc081a137ed9096052821d87dd"
+    },
+    "default": {
+        "beautifulsoup4": "*",
+        "psycopg2": "*",
+        "requests": "*"
+    },
+    "develop": {}
+}
