@@ -13,6 +13,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// CORS headers
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
@@ -22,10 +29,7 @@ app.use((req, res, next) => {
   next(err);
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
+/* dev error handler */
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status( err.code || 500 )
@@ -36,8 +40,7 @@ if (app.get('env') === 'development') {
   });
 }
 
-// production error handler
-// no stacktraces leaked to user
+/* prod error handler */
 app.use((err, req, res, next) => {
   res.status(err.status || 500)
   .json({

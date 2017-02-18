@@ -9,21 +9,6 @@ const connectionString = 'postgres://tomquirk:@localhost:5432/uq_catalogue';
 const db = pgp(connectionString);
 
 module.exports = {
-  getPlanCourses(req, res, next) {
-    db.any('SELECT course.course_code, course.description, course.raw_prerequisites, \
-      course.units, course.course_profile_id, plan_course_list.required FROM course \
-    LEFT OUTER JOIN plan_course_list \
-      ON course.course_code = plan_course_list.course_code \
-    WHERE plan_course_list.plan_code = ${planCode}', req.params)
-      .then(data => {
-        res.status(200)
-          .json({
-            status: 'success',
-            data
-          });
-      })
-      .catch(err => next(err));
-  },
   getPrograms(req, res, next) {
     db.any('SELECT * FROM program', req.params)
       .then(data => {
@@ -36,18 +21,71 @@ module.exports = {
       .catch(err => next(err));
   },
   getProgram(req, res, next) {
-    db.any('SELECT * FROM program WHERE program_code = ${programCode}', req.params)
+    db.any('SELECT program.*,\
+            (\
+                select array_to_json(array_agg(row_to_json(t)))\
+                from (\
+                  SELECT plan_code, title\
+                    FROM plan\
+                    WHERE program_code = ${programCode}\
+                ) t\
+            ) as plan_list\
+            FROM program\
+            WHERE program_code = ${programCode}', req.params)
+
       .then(data => {
         res.status(200)
           .json({
             status: 'success',
-            data
+            data: data[0]
           });
       })
       .catch(err => next(err));
   },
-  getProgramPlans(req, res, next) {
-    db.any('SELECT * FROM plan WHERE program_code = ${programCode}', req.params)
+  getPlan(req, res, next) {
+    db.any('SELECT plan.*,\
+            (\
+              select array_to_json(array_agg(row_to_json(t)))\
+              from (\
+                SELECT course.course_code, course.title, course.description,\
+                  course.raw_prerequisites, course.units, course.course_profile_id,\
+                  (\
+                    select row_to_json(t)\
+                    from (\
+                      SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\
+                      FROM course c\
+                      WHERE c.course_code = course.course_code\
+                  ) t\
+                  ) as semester_offerings\
+                FROM course\
+                LEFT JOIN plan_course_list\
+                  ON course.course_code = plan_course_list.course_code\
+                WHERE plan_course_list.plan_code = ${planCode}\
+            ) t\
+            ) as course_list\
+            FROM plan\
+            WHERE plan_code = ${planCode}', req.params)
+
+      .then(data => {
+        res.status(200)
+          .json({
+            status: 'success',
+            data: data[0]
+          });
+      })
+      .catch(err => next(err));
+  },
+  getCourse(req, res, next) {
+    db.any('SELECT course.course_code, course.title, course.description,\
+            course.raw_prerequisites, course.units, course.course_profile_id,\
+            (\
+                select row_to_json(t)\
+                from (\
+                  SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\
+                  FROM course\
+                  WHERE course_code = ${courseCode}\
+                ) t\
+            ) as semester_offerings\ FROM course WHERE course_code = ${courseCode}', req.params)
       .then(data => {
         res.status(200)
           .json({
