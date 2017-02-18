@@ -17,7 +17,7 @@ This project includes the tools to build the PostgreSQL database (web scraper an
 ### Installation
 
 #### DB/scraper
-1. Create a PostgreSQL db named `uq_catalogue` as root user with no pwd (or change config in `migrations.py` desired) and import `uq_catalogue_schema.sql`
+1. Create a PostgreSQL db and import schema from `schema.sql`.
 2. Setup your virtualenv in python3 - `virtualenv --python=python3 env`- source it and `cd db`
 3. `pip install -r requirements.txt`
 4. `python3 migrations.py` and enter your db details
@@ -35,6 +35,5 @@ The API will depend on a local (or otherwise) installation of the DB.
 Always open for PRs! Check the TODOS and try to make an Issue before submitting a PR to increase transparency.
 
 ## TODO
+- Finish API
 - API docs
-- rm lodash
-- diff webscraped data for DB migration 

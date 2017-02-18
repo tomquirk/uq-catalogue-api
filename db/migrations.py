@@ -1,26 +1,28 @@
-from scrape import Catalogue
+from scrape import *
 from db import Db
 
 
 class Migrate:
-    """
-    Builds database (full wipe, no diff)
-    """
     def __init__(self):
-        self._db = Db()
+        self._db = Db(False)
         self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
-        self._prerequisite_set_count = 0
 
-        self._blacklist = ['COMP1500']  # temporary, should be moved to scrape.py
+        # development use only
+        self._dev_course_count = 0
+        self._dev_plan_count = 0
 
     def reset(self):
         """
         Clears DB, truncating each table in order of dependency
         :return: None
         """
+        check = input('Are you sure you want to wipe the DB? [Y/n] ')
+        if check.lower() != 'y':
+            return
+
         queries = [
             'DELETE from plan_course_list',
-            'DELETE from course_semester_offering',
+            'DELETE from program_course_list',
             'DELETE from course', 'DELETE from plan',
             'DELETE from program'
         ]
@@ -28,146 +30,174 @@ class Migrate:
         for sql in queries:
             self._db.commit(sql)
 
-    def get_state(self):
+    def migrate(self):
         """
-        Returns boolean based on existence of plan code in database (a 'cheap' diff)
-        :param plan_code: program plan code
-        :return:
-        """
-        state = {
-            'programs': [],
-            'plans': [],
-            'courses': []
-        }
-
-        data = self._db.select('SELECT * FROM plan')
-
-        for row in data:
-            state['plans'].append(row[0])
-
-        data = self._db.select('SELECT * FROM program')
-
-        for row in data:
-            state['programs'].append(row[0])
-
-        data = self._db.select('SELECT * FROM course')
-
-        for row in data:
-            state['courses'].append(row[0])
-
-        return state
-
-    def init_catalogue(self):
-        """
-        Builds and returns course
+        Runs the entire migration process
         :return: None
         """
-        state = self.get_state()
-        file = open('backup/catalogue.txt', 'r')
-        catalogue = file.read()
-        if len(catalogue) == 0:
-            catalogue = Catalogue.scrape_catalogue(state)
-        else:
-            catalogue = eval(catalogue)
+        program_list = Catalogue.get_program_list()
 
-        print("************* INITIALIZED MIGRATIONS *************")
+        print("\n************* INITIALISING MIGRATIONS *************\n")
 
-        for program in catalogue['program_list']:
-            if program['program_code'] not in state['programs']:
-                self.add_program(program)
+        for program_code in program_list:
+            print('\nMIGRATING PROGRAM:', program_code)
 
-        for course in catalogue['course_list']:
-            self.add_course(course)
+            program = self.add_program(program_code)
+            self.add_program_course_list(program_code)
 
-        for plan in catalogue['plan_list']:
-            self.add_plan(plan)
+            if program is None:
+                return
 
-        print("************* MIGRATIONS COMPLETE *************")
+            for plan in program['plan_list']:
+                if self._dev_plan_count > 1:
+                    return
+                self._dev_plan_count += 1
+                print('\nMIGRATING PLAN:', plan['plan_code'])
 
-    def add_program(self, program):
+                plan = self.add_plan(plan['plan_code'], plan['title'])
+                self.add_plan_course_list(plan['plan_code'], plan['course_list'])
+
+        print("\n************* MIGRATIONS COMPLETE *************\n")
+
+    def add_program(self, program_code):
         """
 
-        :param program: Dictionary
+        :param program_code: String, 4 digit code of desired program
         :return:
         """
-        sql = """INSERT INTO program
-              (program_code, title, level, abbreviation, duration_years, units)
+        sql = """
+            SELECT program_code
+            FROM program
+            WHERE program_code = '%s'
+            """ % program_code
+        res = self._db.select(sql)
+        if len(res) > 0:
+            return
+
+        program = Program.get_program(program_code)
+
+        sql = """
+              INSERT INTO program
               VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
-              """ % (program['program_code'], program['title'],
-               program['level'], program['abbreviation'],
-               program['durationYears'], program['units'])
+              """ % (program['program_code'], program['title'], program['level'],
+                     program['abbreviation'], program['durationYears'], program['units'])
 
         self._db.commit(sql)
 
-    def add_plan(self, plan):
+        return program
+
+    def add_program_course_list(self, program_code):
         """
 
-        :param plan: Dictionary
+        :param program_code: String, 4 digit code of desired program
         :return:
         """
-        sql = """INSERT INTO plan
-              (plan_code, program_code, title)
+        course_list = Program.get_program_course_list(program_code)
+
+        for course_code in course_list:
+            if self._dev_course_count > 5:
+                return
+            self._dev_course_count += 1
+
+            self.add_course(course_code)
+
+            sql = """
+                  INSERT INTO program_course_list
+                      (course_code, program_code)
+                  SELECT '%s', '%s'
+                  WHERE NOT EXISTS (
+                      SELECT course_code
+                      FROM program_course_list
+                      WHERE course_code = '%s' AND program_code = '%s'
+                  );
+                  """ % (course_code, program_code, course_code, program_code)
+
+            self._db.commit(sql)
+
+        return course_list
+
+    def add_plan(self, plan_code, plan_title):
+        """
+
+        :param plan_code: String, 5 letter plan key followed by 4 digit program code (e.g. SOFTWX2342)
+        :param plan_title: String, plan title
+        :return:
+        """
+        sql = """
+            SELECT plan_code
+            FROM plan
+            WHERE plan_code = '%s'
+            """ % plan_code
+        res = self._db.select(sql)
+        if len(res) > 0:
+            return
+
+        plan = Plan.get_plan(plan_code, plan_title)
+
+        sql = """
+              INSERT INTO plan
               VALUES ('%s', '%s', '%s')
-              """ % (plan['plan_code'], plan['program_code'],
-               plan['title'])
-
+              """ % (plan['plan_code'], plan['program_code'], plan['title'])
 
         self._db.commit(sql)
 
-        for course_code in plan['course_list']:
-            # if course_code in plan['required_course_list']:
-            #     isRequired = 1
-            isRequired = 0
-            self.add_plan_course_list(plan['plan_code'], course_code, isRequired)
+        return plan
 
-    def add_course(self, course):
+    def add_plan_course_list(self, plan_code, plan_course_list):
         """
 
-        :param course: Dictionary
+        :param plan_code: String, 5 letter plan key followed by 4 digit program code (e.g. SOFTWX2342)
+        :param plan_course_list: List, containing Strings, all course codes (e.g. CSSE1001)
+        :return: None
+        """
+        for course_code in plan_course_list:
+            if self._dev_course_count > 20:
+                return
+            self._dev_course_count += 1
+
+            self.add_course(course_code)
+            sql = """
+                INSERT INTO plan_course_list
+                    (course_code, plan_code)
+                SELECT '%s', '%s'
+                WHERE NOT EXISTS (
+                    SELECT course_code
+                    FROM plan_course_list
+                    WHERE course_code = '%s' AND plan_code = '%s'
+                );
+                """ % (course_code, plan_code, course_code, plan_code)
+
+            self._db.commit(sql)
+
+    def add_course(self, course_code):
+        """
+
+        :param course_code: String, 4 letters followed by 4 digits (e.g. MATH1051)
         :return:
         """
-        print("\nADDING: " + course['course_code'] + " to Course")
+        # Check for db entry for course. Don't scrape it if yes
+        sql = """
+            SELECT course_code
+            FROM course
+            WHERE course_code = '%s'
+            """ % course_code
+        res = self._db.select(sql)
+        if len(res) > 0:
+            return
 
-        sql = """INSERT INTO course
-              (course_code, title, description, raw_prerequisites,
-              units, course_profile_id) VALUES ('%s', '%s', '%s', '%s', '%d', '%s')
+        course = Course.get_course(course_code)
+
+        sql = """
+              INSERT INTO course
+              VALUES ('%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s')
               """ % (course['course_code'], course['title'],
-               course['description'].replace("'", "''"), course['raw_prereqs'],
-               course['units'], course['course_profile_id'])
-
-
-        self._db.commit(sql)
-        for semester_offering in course['semester_offerings']:
-            self.add_course_semester_offering(course['course_code'],
-                                              semester_offering)
-        print("\tCOMPLETE: " + course['course_code'])
-
-    def add_course_semester_offering(self, course_code, semester_offering):
-        """
-
-        :param course_code:
-        :param semester_offering:
-        :return:
-        """
-
-        sql = """INSERT INTO course_semester_offering (course_code, semester_offering)
-              VALUES ('%s', '%s')""" % (course_code, semester_offering)
-
-        self._db.commit(sql)
-
-    def add_plan_course_list(self, plan_code, course_code, required):
-        """
-
-        :param plan_code:
-        :param course_code:
-        :return:
-        """
-        sql = """INSERT INTO plan_course_list (course_code, plan_code, required)
-              VALUES ('%s', '%s', '%d')""" % (course_code, plan_code, required)
+                     course['description'].replace("'", "''"), course['raw_prereqs'],
+                     course['units'], course['course_profile_id'], course['semester_offerings'][0],
+                     course['semester_offerings'][1], course['semester_offerings'][2])
 
         self._db.commit(sql)
 
 if __name__ == "__main__":
     migration = Migrate()
     migration.reset()
-    migration.init_catalogue()
+    migration.migrate()

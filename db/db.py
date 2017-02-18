@@ -1,9 +1,10 @@
 import psycopg2
 
 class Db:
-    def __init__(self):
+    def __init__(self, log):
         self._conn = None
         self._cursor = None
+        self._logging = log
 
     def connect(self, dbname, username, password, host):
         """ Establishes connection with psql server
@@ -19,14 +20,14 @@ class Db:
     def select(self, query):
         """ execution suitable for read queries, returning the rows returned from given query.
         """
-        print("Exectuting ", query)
+        self.log("Exectuting " + query)
         self._cursor.execute(query)
         return self._cursor.fetchall()
 
     def commit(self, query):
         """ execution suitable for update queries
         """
-        print("Exectuting ", query)
+        self.log("Exectuting " + query)
         self._cursor.execute(query)
         self._conn.commit()
 
@@ -34,4 +35,7 @@ class Db:
         """Closes database connection
         """
         self._conn.close()
-        
+
+    def log(self, log):
+        if self._logging:
+            print(log)

@@ -1,8 +1,7 @@
-import pprint
 import re
 import requests
-import os
 from bs4 import BeautifulSoup
+
 
 class Course:
     """
@@ -16,7 +15,6 @@ class Course:
         given course
         :return: Dict Object, containing course details
         """
-        print(course_code + ' GETTING')
         base_url = 'http://www.uq.edu.au/study/course.html?course_code=%s' \
                    % course_code
 
@@ -30,7 +28,7 @@ class Course:
             'title': soup.find(id="course-title").get_text()[:-11],
             'description': soup.find(id="course-summary").get_text().replace('"', '').replace("'","''"),
             'units': int(soup.find(id="course-units").get_text()),
-            'semester_offerings': []
+            'semester_offerings': ['false', 'false', 'false']
         }
         parent_description_elem = soup.find(id="description").contents[1].get_text()
         invalid_match = 'This course is not currently offered, please contact the school.'
@@ -49,15 +47,15 @@ class Course:
             str(soup.find_all(id="course-current-offerings"))
 
         if "Semester 1, " in raw_semester_offerings:
-            course_details['semester_offerings'].append('1')
+            course_details['semester_offerings'][0] = 'true'
         if "Semester 2, " in raw_semester_offerings:
-            course_details['semester_offerings'].append('2')
+            course_details['semester_offerings'][1] = 'true'
         if "Summer Semester, " in raw_semester_offerings:
-            course_details['semester_offerings'].append('3')
+            course_details['semester_offerings'][2] = 'true'
         try:
             course_details['course_profile_id'] = soup.find(class_='profile-available')['href'].split('=')[-1]
         except TypeError:
-            course_details['course_profile_id'] = '0'
+            course_details['course_profile_id'] = 0
 
         return course_details
 
@@ -76,29 +74,28 @@ class Plan:
     """
 
     @staticmethod
-    def scrape_plan(plan_code):
+    def get_plan(plan_code, plan_title):
         """
         Scrapes basic data for given program
         :return: None
         """
-
-        base_url = 'https://www.uq.edu.au/study/plan.html?acad_plan=%s' \
-                   % plan_code
+        base_url = 'https://www.uq.edu.au/study/plan.html?acad_plan=%s' % plan_code
 
         r = requests.get(base_url)
         soup = BeautifulSoup(r.content, "html.parser")
 
-        plan_rules = Plan.scrape_plan_rules(plan_code)
+        plan_rules = Plan.get_plan_rules(plan_code)
 
         return {
-            'program_code': soup.find(id="plan-field-key").get_text(),
             'plan_code': plan_code,
+            'title': plan_title,
+            'program_code': soup.find(id="plan-field-key").get_text(),
             'course_list': plan_rules['course_list'],
             'rules': plan_rules['rules']
         }
 
     @staticmethod
-    def scrape_plan_rules(plan_code):
+    def get_plan_rules(plan_code):
         """
         Scrapes rules and courses required for program e.g. Chemistry major
         :return:
@@ -149,7 +146,7 @@ class Program:
     """
 
     @staticmethod
-    def scrape_program_details(program_code):
+    def get_program(program_code):
         """
 
         :param program_code: str, program code for given program (4 digits)
@@ -165,22 +162,22 @@ class Program:
         program = {
             'program_code': program_code,
             'title': soup.find(id="program-title").get_text(),
-            'level': soup.find(id="program-title").get_text().split(' ')[0],
+            'level': soup.find(id="program-title").get_text().split(' ')[0].lower(),
             'abbreviation': soup.find(id="program-abbreviation").get_text(),
             'durationYears': int(soup.find(id="program-domestic-duration").get_text()[0]),
             'units': int(soup.find(id="program-domestic-units").get_text()),
-            'major_list': [],
-            'course_list': (open('backup/program_course_list/%s.txt' % program_code, 'r')).read().replace(' ', '').split(',')
+            'plan_list': [],
+            'course_list': Program.get_program_course_list(program_code)
         }
 
-        raw_majors = soup.find_all('a', href=re.compile("acad_plan"))
-        for raw_major in raw_majors:
+        raw_plans = soup.find_all('a', href=re.compile("acad_plan"))
 
+        for raw_plan in raw_plans:
             # remove extended majors (temporary, consider merging)
-            if raw_major.text != 'Extended Major':
-                plan_code = raw_major['href'][-10:]
-                title = raw_major.text
-                program['major_list'].append({
+            if raw_plan.text != 'Extended Major':
+                plan_code = raw_plan['href'][-10:]
+                title = raw_plan.text
+                program['plan_list'].append({
                     'plan_code': plan_code,
                     'title': title
                 })
@@ -188,7 +185,7 @@ class Program:
         return program
 
     @staticmethod
-    def scrape_full_program_list(program_code):
+    def get_program_course_list(program_code):
         """
         Scrapes list of programs identified by title and program code
         :return: List object, containing dictionaries of program details
@@ -203,24 +200,24 @@ class Program:
         raw_courses = soup.find_all("a", href=re.compile("course_code"))
         for raw_course in raw_courses:
             course_list.append(raw_course.get_text().strip())
-        print(course_list)
+
         return course_list
 
 
 class Catalogue:
     """
-    Utility for building catalogue of UQ programs, courses and academic plans
+    Utility for gathering top-level data from the UQ Catalogue
     """
 
     @staticmethod
-    def scrape_program_list():
+    def get_program_list():
         """
         Scrapes list of programs identified by title and program code
         :return: List object, containing dictionaries of program details
         """
         program_list = []
         # selection filter (program_code)
-        program_selection_filter = ['2342', '2030', '2230']
+        program_selection_filter = ['2342']
 
         url = 'https://www.uq.edu.au/study/browse.html?level=ugpg'
 
@@ -230,117 +227,6 @@ class Catalogue:
         for raw_program in raw_programs:
             program_code = raw_program['href'][-4:]
             if program_code in program_selection_filter:
-                program = Catalogue.scrape_program(program_code)
-                program_list.append(program)
+                program_list.append(program_code)
         
         return program_list
-
-    @staticmethod
-    def scrape_plan(major):
-        """
-        Scrapes everything for given plan
-        :param major: Dictionary, defining a plan (major)
-        :return:
-        """
-
-        course_list = []
-        raw_course_list = []  # course codes as strings
-        flagged_course_list = ['COMP1500']    # invalid courses, etc
-
-        plan = Plan.scrape_plan(major['plan_code'])
-        plan['title'] = major['title']
-        for course_code in plan['course_list']:
-            print("\t\tCOURSE: ", course_code)
-            course = Course.get_course(course_code)
-            if course_code not in raw_course_list and course is not None:
-                print("\t\t\tAVAILABLE: ", course_code)
-                course_list.append(course)
-                raw_course_list.append(course_code)
-        return {
-            'course_list': course_list,
-            'plan': plan
-        }
-
-    @staticmethod
-    def scrape_program(program_code):
-        """
-        Scrapes everything for given plan
-        :param major: Dictionary, defining a program (major)
-        :return:
-        """
-
-        course_list = []
-        raw_course_list = []  # course codes as strings
-        flagged_course_list = ['COMP1500']    # invalid courses, etc
-
-        program = Program.scrape_program_details(program_code)
-        for course_code in program['course_list']:
-            course = Course.get_course(course_code)
-            if course_code not in raw_course_list and course is not None:
-                course_list.append(course)
-        return {
-            'course_list': course_list,
-            'program': program
-        }
-
-    
-
-    @staticmethod
-    def scrape_catalogue(plan_selection_filter):
-        """
-        Scrapes everything
-        :param plan_selection_filter: List, containing program plan codes NOT to be loaded
-        :return: Dict Object, containing all
-        """
-
-        print("\n********* SCRAPE INITIALIZED *********\n\n")
-
-        program_list = Catalogue.scrape_program_list()
-        plan_list = []
-        course_list = []
-        raw_course_list = []    # course codes as strings
-
-        plan_selection_filter = {
-            'plans': []
-        }
-        # change line to 'in' from 'not in' for a reverse filter
-
-        dev_count = 0
-        for program in program_list:
-            print("PROGRAM: ", program['title'])
-
-            for major in program['major_list']:
-
-                if major['plan_code'] not in plan_selection_filter['plans']:
-                    print("\n\tMAJOR: ", major['title'])
-                    plan = Catalogue.scrape_plan(major)
-
-                    if plan['plan'] not in plan_list:
-                        plan_list.append(plan['plan'])
-
-                    for course in plan['course_list']:
-                        if course['course_code'] not in raw_course_list:
-                            course_list.append(course)
-                            raw_course_list.append(course['course_code'])
-
-                    for course in program['course_list']:
-                        if course['course_code'] not in raw_course_list:
-                            course_list.append(course)
-                            raw_course_list.append(course['course_code'])
-
-        print("\n********* SCRAPE COMPLETE *********\n\n")
-
-        catalogue = {
-            'program_list': program_list,
-            'plan_list': plan_list,
-            'course_list': course_list
-        }
-
-        Catalogue.export(catalogue)
-
-        return catalogue
-
-    @staticmethod
-    def export(data):
-        file = open('backup/catalogue.txt', 'w')
-        file.write(pprint.pformat(data))
