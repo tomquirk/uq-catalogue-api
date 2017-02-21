@@ -90,7 +90,7 @@ module.exports = {
         res.status(200)
           .json({
             status: 'success',
-            data
+            data: data[0]
           });
       })
       .catch(err => next(err));
