@@ -48,7 +48,7 @@ CREATE TABLE course (
     semester_1 boolean,
     semester_2 boolean,
     summer_semester boolean,
-    invalid boolean
+    invalid boolean NOT NULL
 );
 
 

@@ -54,13 +54,13 @@ module.exports = {
                     from (\
                       SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\
                       FROM course c\
-                      WHERE c.course_code = course.course_code AND course.invalid != true\
+                      WHERE c.course_code = course.course_code AND course.invalid = false\
                   ) t\
                   ) as semester_offerings\
                 FROM course\
                 LEFT JOIN plan_course_list\
                   ON course.course_code = plan_course_list.course_code\
-                WHERE plan_course_list.plan_code = ${planCode}\
+                WHERE plan_course_list.plan_code = ${planCode} AND course.invalid = false\
             ) t\
             ) as course_list\
             FROM plan\

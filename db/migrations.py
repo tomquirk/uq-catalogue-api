@@ -12,7 +12,7 @@ class Migrate(object):
     """
     def __init__(self):
         self._db = Db(detailed=False)
-        self._db.connect('uq_catalogue', 'tom.quirk', '', 'localhost')
+        self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
 
         # development use only
         # self._dev_course_count = 0
@@ -64,7 +64,7 @@ class Migrate(object):
 
                 print('\tScraping plan...')
                 plan = self.add_plan(plan['plan_code'], plan['title'])
-                print('\tBuilding course list...')
+                print('\tBuilding course list... Size:', len(plan['course_list']))
                 self.add_plan_course_list(plan['plan_code'], plan['course_list'])
 
         print("\n************* MIGRATIONS COMPLETE *************\n")
@@ -219,7 +219,7 @@ class Migrate(object):
 
         sql = """
               INSERT INTO course
-              VALUES ('%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s')
+              VALUES ('%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', 'false')
               """ % (course['course_code'], course['title'],
                      course['description'], course['raw_prereqs'],
                      course['units'], course['course_profile_id'], course['semester_offerings'][0],
