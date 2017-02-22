@@ -2,7 +2,11 @@
 > (Unofficial) webscraper and API for University of Queensland Course and Program Data
 
 ## Overview
-This project includes the tools to build the PostgreSQL database (web scraper and sql schema) as well as the REST API (currently in Node). 
+This project includes the tools to build the PostgreSQL database (web scraper and sql schema) as well as the REST API (currently in Node).
+
+## Documentation
+
+[http://docs.uq.apiary.io/#](View the docs!)
 
 ## Getting Started
 
