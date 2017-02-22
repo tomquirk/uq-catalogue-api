@@ -1,9 +1,13 @@
+"""
+Scrape
+"""
+
 import re
 import requests
 from bs4 import BeautifulSoup
 
 
-class Course:
+class Course(object):
     """
     Scrapes and holds all data pertaining to course
     """
@@ -25,16 +29,17 @@ class Course:
 
         course_details = {
             'course_code': course_code,
-            'title': soup.find(id="course-title").get_text()[:-11],
-            'description': soup.find(id="course-summary").get_text().replace('"', '').replace("'","''"),
+            'title': soup.find(id="course-title").get_text()[:-11].replace("'", "''"),
+            'description': soup.find(id="course-summary").get_text().replace('"', '').replace("'", "''"),
             'units': int(soup.find(id="course-units").get_text()),
             'semester_offerings': ['false', 'false', 'false']
         }
+
         parent_description_elem = soup.find(id="description").contents[1].get_text()
         invalid_match = 'This course is not currently offered, please contact the school.'
         # case for deprecated courses w/ no units (e.g. COMP1500) or other determining factors
         if course_details['units'] < 1 or invalid_match in parent_description_elem:
-            print('\t\t\tCOURSE NOT VALID: %s' % course_code)
+            print('\t\tCOURSE NOT VALID: %s' % course_code)
             return None
 
         try:
@@ -68,7 +73,7 @@ class Course:
         return None
 
 
-class Plan:
+class Plan(object):
     """
     utility class for gathering academic plan details
     """
@@ -119,28 +124,27 @@ class Plan:
         for course in raw_courses:
 
             raw_course = course.get_text().strip()
-            courseObj = Course.get_course(raw_course)
-            if raw_course not in plan_rules['course_list'] and courseObj is not None:
+            if raw_course not in plan_rules['course_list']:
                 plan_rules['course_list'].append(raw_course)
 
-        for section in raw_rules:
-            rsoup = BeautifulSoup(str(section), "html.parser")
-            rule = {
-                'text': rsoup.find("p").get_text().strip().replace('\n', '<br>'),
-                'courses': []
-            }
+        # for section in raw_rules:
+        #     rsoup = BeautifulSoup(str(section), "html.parser")
+        #     rule = {
+        #         'text': rsoup.find("p").get_text().strip().replace('\n', '<br>'),
+        #         'courses': []
+        #     }
 
-            raw_courses = rsoup.find_all("a", href=re.compile("course_code"))
-            for raw_course in raw_courses:
-                rule['courses'].append(raw_course.get_text().strip())
+        #     raw_courses = rsoup.find_all("a", href=re.compile("course_code"))
+        #     for raw_course in raw_courses:
+        #         rule['courses'].append(raw_course.get_text().strip())
 
-            if len(rule['text']) != 0 and len(rule['courses']) != 0:
-                plan_rules['rules'].append(rule)
+        #     if len(rule['text']) != 0 and len(rule['courses']) != 0:
+        #         plan_rules['rules'].append(rule)
 
         return plan_rules
 
 
-class Program:
+class Program(object):
     """
     Utility class for gathering program information, eg Bachelor of Science
     """
@@ -155,10 +159,8 @@ class Program:
 
         url = "https://www.uq.edu.au/study/program.html?acad_prog=" \
               + str(program_code)
-
         r = requests.get(url)
         soup = BeautifulSoup(r.content, "html.parser")
-
         program = {
             'program_code': program_code,
             'title': soup.find(id="program-title").get_text(),
@@ -181,7 +183,6 @@ class Program:
                     'plan_code': plan_code,
                     'title': title
                 })
-
         return program
 
     @staticmethod
@@ -204,7 +205,7 @@ class Program:
         return course_list
 
 
-class Catalogue:
+class Catalogue(object):
     """
     Utility for gathering top-level data from the UQ Catalogue
     """
@@ -217,7 +218,7 @@ class Catalogue:
         """
         program_list = []
         # selection filter (program_code)
-        program_selection_filter = ['2342']
+        program_selection_filter = ['2030', '2342']
 
         url = 'https://www.uq.edu.au/study/browse.html?level=ugpg'
 
@@ -228,5 +229,5 @@ class Catalogue:
             program_code = raw_program['href'][-4:]
             if program_code in program_selection_filter:
                 program_list.append(program_code)
-        
+
         return program_list

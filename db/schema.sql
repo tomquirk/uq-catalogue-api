@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.1
--- Dumped by pg_dump version 9.6.1
+-- Dumped from database version 9.4.5
+-- Dumped by pg_dump version 9.6.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -40,14 +40,15 @@ SET default_with_oids = false;
 
 CREATE TABLE course (
     course_code character(8) NOT NULL,
-    title character varying(100) NOT NULL,
-    description text NOT NULL,
-    raw_prerequisites text NOT NULL,
-    units integer NOT NULL,
-    course_profile_id integer NOT NULL,
+    title character varying(100),
+    description text,
+    raw_prerequisites text,
+    units integer,
+    course_profile_id integer,
     semester_1 boolean,
     semester_2 boolean,
-    summer_semester boolean
+    summer_semester boolean,
+    invalid boolean
 );
 
 

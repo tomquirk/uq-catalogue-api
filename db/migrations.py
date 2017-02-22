@@ -1,15 +1,22 @@
+"""
+Migrate
+"""
+
 from scrape import *
 from db import Db
 
 
-class Migrate:
+class Migrate(object):
+    """
+    Utility class to facilitate scraping and database migrations
+    """
     def __init__(self):
-        self._db = Db(False)
-        self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
+        self._db = Db(detailed=False)
+        self._db.connect('uq_catalogue', 'tom.quirk', '', 'localhost')
 
         # development use only
-        self._dev_course_count = 0
-        self._dev_plan_count = 0
+        # self._dev_course_count = 0
+        # self._dev_plan_count = 0
 
     def reset(self):
         """
@@ -41,20 +48,23 @@ class Migrate:
 
         for program_code in program_list:
             print('\nMIGRATING PROGRAM:', program_code)
-
+            print('\tScraping program...')
             program = self.add_program(program_code)
+            print('\tBuilding course list...')
             self.add_program_course_list(program_code)
 
             if program is None:
                 return
 
             for plan in program['plan_list']:
-                if self._dev_plan_count > 1:
-                    return
-                self._dev_plan_count += 1
+                # if self._dev_plan_count > 1:
+                    # return
+                # self._dev_plan_count += 1
                 print('\nMIGRATING PLAN:', plan['plan_code'])
 
+                print('\tScraping plan...')
                 plan = self.add_plan(plan['plan_code'], plan['title'])
+                print('\tBuilding course list...')
                 self.add_plan_course_list(plan['plan_code'], plan['course_list'])
 
         print("\n************* MIGRATIONS COMPLETE *************\n")
@@ -71,10 +81,13 @@ class Migrate:
             WHERE program_code = '%s'
             """ % program_code
         res = self._db.select(sql)
-        if len(res) > 0:
-            return
 
         program = Program.get_program(program_code)
+
+        if program is None:
+            return None
+        elif len(res) > 0:
+            return program
 
         sql = """
               INSERT INTO program
@@ -95,11 +108,13 @@ class Migrate:
         course_list = Program.get_program_course_list(program_code)
 
         for course_code in course_list:
-            if self._dev_course_count > 5:
-                return
-            self._dev_course_count += 1
+            # if self._dev_course_count > 5:
+                # return
+            # self._dev_course_count += 1
 
-            self.add_course(course_code)
+            course = self.add_course(course_code)
+            if course is None:
+                continue
 
             sql = """
                   INSERT INTO program_course_list
@@ -129,10 +144,13 @@ class Migrate:
             WHERE plan_code = '%s'
             """ % plan_code
         res = self._db.select(sql)
-        if len(res) > 0:
-            return
 
         plan = Plan.get_plan(plan_code, plan_title)
+
+        if plan is None:
+            return None
+        elif len(res) > 0:
+            return plan
 
         sql = """
               INSERT INTO plan
@@ -151,11 +169,14 @@ class Migrate:
         :return: None
         """
         for course_code in plan_course_list:
-            if self._dev_course_count > 20:
-                return
-            self._dev_course_count += 1
+            # if self._dev_course_count > 20:
+                # return
+            # self._dev_course_count += 1
 
-            self.add_course(course_code)
+            course = self.add_course(course_code)
+            if course is None:
+                continue
+
             sql = """
                 INSERT INTO plan_course_list
                     (course_code, plan_code)
@@ -183,19 +204,30 @@ class Migrate:
             """ % course_code
         res = self._db.select(sql)
         if len(res) > 0:
-            return
+            return False
 
         course = Course.get_course(course_code)
+        if course is None:
+            sql = """
+              INSERT INTO course
+              (course_code, invalid)
+              VALUES ('%s', 'true')
+              """ % course_code
+
+            self._db.commit(sql)
+            return None
 
         sql = """
               INSERT INTO course
               VALUES ('%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s')
               """ % (course['course_code'], course['title'],
-                     course['description'].replace("'", "''"), course['raw_prereqs'],
+                     course['description'], course['raw_prereqs'],
                      course['units'], course['course_profile_id'], course['semester_offerings'][0],
                      course['semester_offerings'][1], course['semester_offerings'][2])
 
         self._db.commit(sql)
+
+        return course
 
 if __name__ == "__main__":
     migration = Migrate()

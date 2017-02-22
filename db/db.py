@@ -1,10 +1,17 @@
+"""
+Database Utility
+"""
+
 import psycopg2
 
-class Db:
-    def __init__(self, log):
+class Db(object):
+    """
+    Mini wrapper for database interaction
+    """
+    def __init__(self, detailed):
         self._conn = None
         self._cursor = None
-        self._logging = log
+        self._detailed = detailed
 
     def connect(self, dbname, username, password, host):
         """ Establishes connection with psql server
@@ -37,5 +44,5 @@ class Db:
         self._conn.close()
 
     def log(self, log):
-        if self._logging:
+        if self._detailed:
             print(log)

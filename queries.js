@@ -54,7 +54,7 @@ module.exports = {
                     from (\
                       SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\
                       FROM course c\
-                      WHERE c.course_code = course.course_code\
+                      WHERE c.course_code = course.course_code AND course.invalid != true\
                   ) t\
                   ) as semester_offerings\
                 FROM course\
