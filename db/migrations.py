@@ -12,7 +12,7 @@ class Migrate(object):
     """
     def __init__(self):
         self._db = Db(detailed=False)
-        self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
+        self._db.connect('uq_catalogue', 'YOUR_USERNAME', 'YOUR_PASSWORD', 'localhost')
 
         # development use only
         # self._dev_course_count = 0
