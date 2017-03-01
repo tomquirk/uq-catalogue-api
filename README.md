@@ -1,4 +1,4 @@
-# UQ API (unofficial)
+# UQ Catalogue API (unofficial)
 > (Unofficial) webscraper and API for University of Queensland Course and Program Data
 
 ## Overview
