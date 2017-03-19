@@ -79,6 +79,14 @@ module.exports = {
     db.any('SELECT course.course_code, course.title, course.description,\
             course.raw_prerequisites, course.units, course.course_profile_id,\
             (\
+                select array_to_json(array_agg(t))\
+                from (\
+                  SELECT incompatible_course_code as course_code\
+                  FROM incompatible_courses\
+                  WHERE course_code = ${courseCode}\
+                ) t\
+            ) as incompatible_courses,\
+            (\
                 select row_to_json(t)\
                 from (\
                   SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\

@@ -249,7 +249,7 @@ class Migrate(object):
 
         for i_course_code in incompatible_courses:
             if len(i_course_code) != 8:
-                self._logfile.write(course_code)
+                self._logfile.write(course_code + '\n')
                 continue
             # Ensure all courses are added to `course` table
             self.add_course(i_course_code)
