@@ -11,8 +11,9 @@ class Migrate(object):
     Utility class to facilitate scraping and database migrations
     """
     def __init__(self):
-        self._db = Db(detailed=False)
+        self._db = Db(detailed=True)
         self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
+        self._logfile = None
 
         # development use only
         # self._dev_course_count = 0
@@ -30,6 +31,7 @@ class Migrate(object):
         queries = [
             'DELETE from plan_course_list',
             'DELETE from program_course_list',
+            'DELETE from incompatible_courses',
             'DELETE from course', 'DELETE from plan',
             'DELETE from program'
         ]
@@ -42,6 +44,7 @@ class Migrate(object):
         Runs the entire migration process
         :return: None
         """
+        self._logfile = open('course_incompat.txt', 'w')
         program_list = Catalogue.get_program_list()
 
         print("\n************* INITIALISING MIGRATIONS *************\n")
@@ -196,7 +199,10 @@ class Migrate(object):
         :param course_code: String, 4 letters followed by 4 digits (e.g. MATH1051)
         :return:
         """
+
         # Check for db entry for course. Don't scrape it if yes
+        if len(course_code) != 8:
+            return None
         sql = """
             SELECT course_code
             FROM course
@@ -227,7 +233,44 @@ class Migrate(object):
 
         self._db.commit(sql)
 
+        self.add_incompatible_courses(course_code, course["incompatible_courses"])
+
         return course
+
+    def add_incompatible_courses(self, course_code, incompatible_courses):
+        """
+
+        :param course_code: String, course code of parent
+        :param incompatible_courses: List, course code/s as Strings
+        :return:
+        """
+        if incompatible_courses is None:
+            return
+
+        for i_course_code in incompatible_courses:
+            if len(i_course_code) != 8:
+                self._logfile.write(course_code)
+                continue
+            # Ensure all courses are added to `course` table
+            self.add_course(i_course_code)
+
+            sql = """
+                SELECT course_code
+                FROM incompatible_courses
+                WHERE course_code = '%s'
+                AND incompatible_course_code = '%s'
+                """ % (course_code, i_course_code)
+            res = self._db.select(sql)
+            if len(res) > 0:
+                continue
+
+            sql = """
+                  INSERT INTO incompatible_courses
+                  VALUES ('%s', '%s')
+                  """ % (course_code, i_course_code)
+
+            self._db.commit(sql)
+
 
 if __name__ == "__main__":
     migration = Migrate()

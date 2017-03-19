@@ -5,3 +5,4 @@ npm-debug.*
 **/*.venv
 .idea/
 *.pyc
+logger.js

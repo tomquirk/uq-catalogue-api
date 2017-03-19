@@ -1,14 +1,17 @@
 const express = require('express');
 const path = require('path');
-const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const routes = require('./routes');
+const logger = require('./logger');
 
 const app = express();
 
-app.use(logger('dev'));
+if (app.get('env') === 'production') {
+  app.use(logger);
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -32,22 +35,21 @@ app.use((req, res, next) => {
 /* dev error handler */
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    res.status( err.code || 500 )
-    .json({
-      status: 'error',
-      message: err
-    });
+    res.status(err.code || 500)
+      .json({
+        status: 'error',
+        message: err
+      });
   });
 }
 
 /* prod error handler */
 app.use((err, req, res, next) => {
   res.status(err.status || 500)
-  .json({
-    status: 'error',
-    message: err.message
-  });
+    .json({
+      status: 'error',
+      message: err.message
+    });
 });
-
 
 module.exports = app;

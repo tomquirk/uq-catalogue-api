@@ -5,6 +5,7 @@ Scrape
 import re
 import requests
 from bs4 import BeautifulSoup
+from pprint import pprint
 
 
 class Course(object):
@@ -27,10 +28,19 @@ class Course(object):
             return None
         soup = BeautifulSoup(r.content, "html.parser")
 
+        if soup.find(id="course-notfound"):
+            return None
+
+        course_summary = soup.find(id="course-summary").get_text().replace('"', '').replace("'", "''")
+
+        # handle edge-case (see STAT2203)
+        if '\n' in course_summary:
+            course_summary = course_summary.split('\n')[0]
+
         course_details = {
             'course_code': course_code,
             'title': soup.find(id="course-title").get_text()[:-11].replace("'", "''"),
-            'description': soup.find(id="course-summary").get_text().replace('"', '').replace("'", "''"),
+            'description': course_summary,
             'units': int(soup.find(id="course-units").get_text()),
             'semester_offerings': ['false', 'false', 'false']
         }
@@ -46,7 +56,19 @@ class Course(object):
             course_details['raw_prereqs'] = \
                 soup.find(id="course-prerequisite").get_text()
         except AttributeError:
-            course_details['raw_prereqs'] = ''
+            course_details['raw_prereqs'] = None
+
+        try:
+            course_details['incompatible_courses'] = \
+                soup.find(id="course-incompatible").get_text()\
+                    .replace(' and ', ', ') \
+                    .replace(' or ', ', ') \
+                    .replace(' & ', ', ') \
+                    .replace('; ', ', ') \
+                    .split(', ')
+
+        except AttributeError:
+            course_details['incompatible_courses'] = None
 
         raw_semester_offerings = \
             str(soup.find_all(id="course-current-offerings"))
@@ -231,3 +253,6 @@ class Catalogue(object):
                 program_list.append(program_code)
 
         return program_list
+
+if __name__ == "__main__":
+    Course.get_course('ENGG1100')
