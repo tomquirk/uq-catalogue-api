@@ -11,7 +11,7 @@ class Migrate(object):
     Utility class to facilitate scraping and database migrations
     """
     def __init__(self):
-        self._db = Db(detailed=True)
+        self._db = Db(detailed=False)
         self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
         self._logfile = None
 
