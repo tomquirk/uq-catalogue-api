@@ -50,6 +50,14 @@ module.exports = {
                 SELECT course.course_code, course.title, course.description,\
                   course.raw_prerequisites, course.units, course.course_profile_id,\
                   (\
+                      select array_to_json(array_agg(t))\
+                      from (\
+                        SELECT incompatible_course_code as course_code\
+                        FROM incompatible_courses ic\
+                        WHERE ic.course_code = course.course_code\
+                      ) t\
+                  ) as incompatible_courses,\
+                  (\
                     select row_to_json(t)\
                     from (\
                       SELECT semester_1 as "1", semester_2 as "2", summer_semester as "summer"\
