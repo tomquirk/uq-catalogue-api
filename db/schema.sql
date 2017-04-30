@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.4.5
+-- Dumped from database version 9.6.2
 -- Dumped by pg_dump version 9.6.2
 
 SET statement_timeout = 0;
@@ -15,14 +15,14 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -35,7 +35,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: course; Type: TABLE; Schema: public; Owner: -
+-- Name: course; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE course (
@@ -52,8 +52,22 @@ CREATE TABLE course (
 );
 
 
+ALTER TABLE course OWNER TO postgres;
+
 --
--- Name: plan; Type: TABLE; Schema: public; Owner: -
+-- Name: incompatible_courses; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE incompatible_courses (
+    course_code character varying(8) NOT NULL,
+    incompatible_course_code character varying(8) NOT NULL
+);
+
+
+ALTER TABLE incompatible_courses OWNER TO postgres;
+
+--
+-- Name: plan; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE plan (
@@ -63,8 +77,10 @@ CREATE TABLE plan (
 );
 
 
+ALTER TABLE plan OWNER TO postgres;
+
 --
--- Name: plan_course_list; Type: TABLE; Schema: public; Owner: -
+-- Name: plan_course_list; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE plan_course_list (
@@ -74,8 +90,10 @@ CREATE TABLE plan_course_list (
 );
 
 
+ALTER TABLE plan_course_list OWNER TO postgres;
+
 --
--- Name: program; Type: TABLE; Schema: public; Owner: -
+-- Name: program; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE program (
@@ -88,8 +106,10 @@ CREATE TABLE program (
 );
 
 
+ALTER TABLE program OWNER TO postgres;
+
 --
--- Name: program_course_list; Type: TABLE; Schema: public; Owner: -
+-- Name: program_course_list; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE program_course_list (
@@ -98,8 +118,10 @@ CREATE TABLE program_course_list (
 );
 
 
+ALTER TABLE program_course_list OWNER TO postgres;
+
 --
--- Name: course course_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: course course_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY course
@@ -107,7 +129,15 @@ ALTER TABLE ONLY course
 
 
 --
--- Name: plan_course_list plan_course_list_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: incompatible_courses incompatible_courses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY incompatible_courses
+    ADD CONSTRAINT incompatible_courses_pkey PRIMARY KEY (course_code, incompatible_course_code);
+
+
+--
+-- Name: plan_course_list plan_course_list_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY plan_course_list
@@ -115,7 +145,7 @@ ALTER TABLE ONLY plan_course_list
 
 
 --
--- Name: plan planpk; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: plan planpk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY plan
@@ -123,7 +153,7 @@ ALTER TABLE ONLY plan
 
 
 --
--- Name: program_course_list program_course_list_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: program_course_list program_course_list_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY program_course_list
@@ -131,7 +161,7 @@ ALTER TABLE ONLY program_course_list
 
 
 --
--- Name: program program_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: program program_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY program
@@ -139,7 +169,7 @@ ALTER TABLE ONLY program
 
 
 --
--- Name: plan_course_list course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: plan_course_list course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY plan_course_list
@@ -147,7 +177,15 @@ ALTER TABLE ONLY plan_course_list
 
 
 --
--- Name: program_course_list coursecodefk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: incompatible_courses course_code_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY incompatible_courses
+    ADD CONSTRAINT course_code_fk FOREIGN KEY (course_code) REFERENCES course(course_code);
+
+
+--
+-- Name: program_course_list coursecodefk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY program_course_list
@@ -155,7 +193,15 @@ ALTER TABLE ONLY program_course_list
 
 
 --
--- Name: plan_course_list plancodefk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: incompatible_courses i_course_code_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY incompatible_courses
+    ADD CONSTRAINT i_course_code_fk FOREIGN KEY (incompatible_course_code) REFERENCES course(course_code);
+
+
+--
+-- Name: plan_course_list plancodefk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY plan_course_list
@@ -163,7 +209,7 @@ ALTER TABLE ONLY plan_course_list
 
 
 --
--- Name: program_course_list programcodefk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: program_course_list programcodefk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY program_course_list

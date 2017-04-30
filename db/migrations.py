@@ -12,7 +12,7 @@ class Migrate(object):
     """
     def __init__(self):
         self._db = Db(detailed=False)
-        self._db.connect('uq_catalogue', 'tomquirk', '', 'localhost')
+        self._db.connect('uq_catalogue', 'postgres', '', 'localhost')
         self._logfile = None
 
         # development use only

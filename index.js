@@ -4,13 +4,13 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const routes = require('./routes');
-const logger = require('./logger');
+// const logger = require('./logger');
 
 const app = express();
 
-if (app.get('env') === 'production') {
-  app.use(logger);
-}
+// if (app.get('env') === 'production') {
+//   app.use(logger);
+// }
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

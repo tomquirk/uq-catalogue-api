@@ -4,7 +4,7 @@
 ## Overview
 This project includes the tools to build the PostgreSQL database (web scraper and sql schema) as well as the REST API (currently in Node).
 
-## Documentation
+## Documentation (incomplete)
 
 [http://docs.uq.apiary.io/#](View the docs!)
 
