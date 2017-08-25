@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* The REST API will depend on an installation of the DB. By default, it looks for `localhost:5432/uq_catalogue`.
+* The REST API will depend on an installation of the DB. By default, it points at `localhost:5432/uq_catalogue`.
 
 ## Installation
 

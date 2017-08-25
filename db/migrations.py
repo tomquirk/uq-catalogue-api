@@ -2,16 +2,17 @@
 Migrate
 """
 
-from scrape import *
-from db import Db
+import scrape
+import database
 
 
 class Migrate(object):
     """
     Utility class to facilitate scraping and database migrations
     """
+
     def __init__(self):
-        self._db = Db(detailed=False)
+        self._db = database.Db(detailed=False)
         self._db.connect('uq_cat', 'postgres', '', 'localhost')
         self._logfile = None
 
@@ -45,7 +46,7 @@ class Migrate(object):
         :return: None
         """
         self._logfile = open('course_incompat.txt', 'w')
-        program_list = Catalogue.get_program_list()
+        program_list = scrape.catalogue()
 
         print("\n************* INITIALISING MIGRATIONS *************\n")
 
@@ -67,8 +68,10 @@ class Migrate(object):
 
                 print('\tScraping plan...')
                 plan = self.add_plan(plan['plan_code'], plan['title'])
-                print('\tBuilding course list... Size:', len(plan['course_list']))
-                self.add_plan_course_list(plan['plan_code'], plan['course_list'])
+                print('\tBuilding course list... Size:',
+                      len(plan['course_list']))
+                self.add_plan_course_list(
+                    plan['plan_code'], plan['course_list'])
 
         print("\n************* MIGRATIONS COMPLETE *************\n")
 
@@ -85,7 +88,7 @@ class Migrate(object):
             """ % program_code
         res = self._db.select(sql)
 
-        program = Program.get_program(program_code)
+        program = scrape.program(program_code)
 
         if program is None:
             return None
@@ -108,7 +111,7 @@ class Migrate(object):
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        course_list = Program.get_program_course_list(program_code)
+        course_list = scrape.program_course_list(program_code)
 
         for course_code in course_list:
             # if self._dev_course_count > 5:
@@ -148,7 +151,7 @@ class Migrate(object):
             """ % plan_code
         res = self._db.select(sql)
 
-        plan = Plan.get_plan(plan_code, plan_title)
+        plan = scrape.plan(plan_code, plan_title)
 
         if plan is None:
             return None
@@ -212,7 +215,7 @@ class Migrate(object):
         if len(res) > 0:
             return False
 
-        course = Course.get_course(course_code)
+        course = scrape.course(course_code)
         if course is None:
             sql = """
               INSERT INTO course
@@ -233,7 +236,8 @@ class Migrate(object):
 
         self._db.commit(sql)
 
-        self.add_incompatible_courses(course_code, course["incompatible_courses"])
+        self.add_incompatible_courses(
+            course_code, course["incompatible_courses"])
 
         return course
 

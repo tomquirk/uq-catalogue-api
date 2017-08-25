@@ -10,12 +10,15 @@
 To build the database:
 
 1. Create a PostgreSQL db (something like `uq_catalogue`) and import schema from `schema.sql`
-1. In the `db` directory, setup your virtualenv using python3
+2. Setup your virtualenv using python3 and install dependencies
 
 ```bash
-virtualenv --python=python3 .venv && source .venv/bin/activate
+virtualenv --python=python3 .venv && source .venv/bin/activate && pip install -r requirements.txt
 ```
 
-1. Install dependencies - `pip install -r requirements.txt`
-1. `python migrations.py` and enter your db details
-1. Get a coffee, this might take a while...
+4. Run `python migrations.py` and enter your db details
+5. Get a coffee, this might take a while...
+
+## Scrape Package
+
+The Scrape package defines all methods for scraping specific parts of the UQ website. It resides under `scrape/`.

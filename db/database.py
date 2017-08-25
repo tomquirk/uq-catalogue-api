@@ -4,10 +4,12 @@ Database Utility
 
 import psycopg2
 
+
 class Db(object):
     """
     Mini wrapper for database interaction
     """
+
     def __init__(self, detailed):
         self._conn = None
         self._cursor = None
@@ -18,7 +20,7 @@ class Db(object):
         """
         try:
             connect_str = "dbname='%s' user='%s' host='%s' password='%s'" % \
-              (dbname, username, host, password)
+                (dbname, username, host, password)
             self._conn = psycopg2.connect(connect_str)
             self._cursor = self._conn.cursor()
         except Exception as e:
@@ -44,5 +46,7 @@ class Db(object):
         self._conn.close()
 
     def log(self, log):
+        """stdout wrapper
+        """
         if self._detailed:
             print(log)
