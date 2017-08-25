@@ -5,7 +5,7 @@ const options = {
 };
 
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://postgres:@localhost:5432/uq_catalogue';
+const connectionString = 'postgres://postgres:@localhost:5432/uq_cat';
 const db = pgp(connectionString);
 
 module.exports = {
