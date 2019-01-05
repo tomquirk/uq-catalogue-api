@@ -6,14 +6,14 @@ import scrape
 import database
 
 
-class Migrate(object):
+class Pipeline(object):
     """
-    Utility class to facilitate scraping and database migrations
+    Utility class to facilitate ETL pipeline
     """
 
     def __init__(self):
         self._db = database.Db(detailed=False)
-        self._db.connect('uq_cat', 'postgres', '', 'localhost')
+        self._db.connect('uq_catalogue', 'postgres', '', 'localhost')
         self._logfile = None
 
         # development use only
@@ -40,7 +40,7 @@ class Migrate(object):
         for sql in queries:
             self._db.commit(sql)
 
-    def migrate(self):
+    def run(self):
         """
         Runs the entire migration process
         :return: None
@@ -277,6 +277,6 @@ class Migrate(object):
 
 
 if __name__ == "__main__":
-    migration = Migrate()
+    pipeline = Pipeline()
     migration.reset()
-    migration.migrate()
+    pipeline.run()
