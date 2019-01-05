@@ -12,18 +12,23 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details
     """
+    print(course_code)
     base_url = f'{settings.UQ_BASE_URL}/programs-courses/course.html?course_code={course_code}'
     soup = helpers.get_soup(base_url)
 
     if soup is None or soup.find(id="course-notfound"):
         return None
 
-    course_summary = soup.find(
-        id="course-summary").get_text().replace('"', '').replace("'", "''")
+    course_summary_raw = soup.find(
+        id="course-summary")
+        
+    course_summary = None
+    if course_summary_raw:
+        course_summary = course_summary_raw.get_text().replace('"', '').replace("'", "''")
 
-    # handle edge-case (see STAT2203)
-    if '\n' in course_summary:
-        course_summary = course_summary.split('\n')[0]
+        # handle edge-case (see STAT2203)
+        if '\n' in course_summary:
+            course_summary = course_summary.split('\n')[0]
 
     course_details = {
         'course_code': course_code,
