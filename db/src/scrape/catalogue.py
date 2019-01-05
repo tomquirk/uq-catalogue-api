@@ -3,7 +3,7 @@ Catalogue scraper
 """
 import re
 import scrape.helpers as helpers
-from src import settings
+import settings
 
 
 def catalogue():

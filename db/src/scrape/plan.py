@@ -3,7 +3,7 @@ Plan scraper
 """
 import re
 import scrape.helpers as helpers
-from src import settings
+import settings
 
 
 def plan(plan_code, plan_title):

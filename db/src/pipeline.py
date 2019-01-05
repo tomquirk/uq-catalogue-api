@@ -53,7 +53,7 @@ class Pipeline(object):
         :return: None
         """
         self._logfile = open('course_incompat.txt', 'w')
-        program_list = catalogue.catalogue()
+        program_list = catalogue()
 
         print("\n************* INITIALISING PIPELINE *************\n")
 

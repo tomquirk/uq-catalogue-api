@@ -2,8 +2,7 @@
 Course scraper
 """
 import scrape.helpers as helpers
-from src import settings
-
+import settings
 
 def course(course_code):
     """
