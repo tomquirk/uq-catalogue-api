@@ -3,6 +3,7 @@ Program scraper
 """
 import re
 import scrape.helpers as helpers
+from src import settings
 
 
 def program(program_code):
@@ -12,7 +13,7 @@ def program(program_code):
     :return: Dict, program details
     """
 
-    url = "https://www.uq.edu.au/study/program.html?acad_prog=" \
+    url = f"{settings.UQ_BASE_URL}/study/program.html?acad_prog=" \
         + str(program_code)
     soup = helpers.get_soup(url)
 
@@ -50,7 +51,7 @@ def get_program_course_list(program_code):
     course_list = []
     # selection filter (program_code)
 
-    url = 'https://www.uq.edu.au/study/program_list.html?acad_prog=%s' % program_code
+    url = f'{settings.UQ_BASE_URL}study/program_list.html?acad_prog=%s' % program_code
     soup = helpers.get_soup(url)
 
     raw_courses = soup.find_all("a", href=re.compile("course_code"))

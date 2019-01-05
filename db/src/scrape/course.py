@@ -2,6 +2,7 @@
 Course scraper
 """
 import scrape.helpers as helpers
+from src import settings
 
 
 def course(course_code):
@@ -10,7 +11,7 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details
     """
-    base_url = 'http://www.uq.edu.au/study/course.html?course_code=%s' \
+    base_url = f'{settings.UQ_BASE_URL}/study/course.html?course_code=%s' \
         % course_code
 
     soup = helpers.get_soup(base_url)

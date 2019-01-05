@@ -3,6 +3,7 @@ Plan scraper
 """
 import re
 import scrape.helpers as helpers
+from src import settings
 
 
 def plan(plan_code, plan_title):
@@ -10,7 +11,7 @@ def plan(plan_code, plan_title):
     Scrapes basic data for given program
     :return: None
     """
-    base_url = 'https://www.uq.edu.au/study/plan.html?acad_plan=%s' % plan_code
+    base_url = f'{settings.UQ_BASE_URL}/study/plan.html?acad_plan=%s' % plan_code
 
     soup = helpers.get_soup(base_url)
 
@@ -36,7 +37,7 @@ def get_plan_rules(plan_code):
         'rules': []
     }
 
-    base_url = 'https://www.uq.edu.au/study/plan_display.html?acad_plan=%s'\
+    base_url = f'{settings.UQ_BASE_URL}/study/plan_display.html?acad_plan=%s'\
         % plan_code
 
     soup = helpers.get_soup(base_url)

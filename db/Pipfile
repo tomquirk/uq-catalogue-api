@@ -7,6 +7,8 @@ name = "pypi"
 "beautifulsoup4" = "*"
 "psycopg2" = "*"
 requests = "*"
+"autopep8" = "*"
+"flake8" = "*"
 
 [dev-packages]
 

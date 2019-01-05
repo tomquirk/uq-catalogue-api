@@ -3,6 +3,7 @@ Catalogue scraper
 """
 import re
 import scrape.helpers as helpers
+from src import settings
 
 
 def catalogue():
@@ -14,7 +15,7 @@ def catalogue():
     # selection filter (program_code)
     program_selection_filter = ['2030', '2342']
 
-    url = 'https://www.uq.edu.au/study/browse.html?level=ugpg'
+    url = f'{settings.UQ_BASE_URL}/study/browse.html?level=ugpg'
     soup = helpers.get_soup(url)
 
     raw_programs = soup.find_all('a', href=re.compile("acad_prog"))

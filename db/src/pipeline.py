@@ -2,18 +2,25 @@
 Migrate
 """
 
-import scrape
 import database
+import settings
+
+from scrape.course import course
+from scrape.catalogue import catalogue
+from scrape.plan import plan
+from scrape.program import program
+from scrape.program import get_program_course_list as program_course_list
 
 
 class Pipeline(object):
     """
-    Utility class to facilitate ETL pipeline
+    Utility class for ETL pipeline
     """
 
     def __init__(self):
         self._db = database.Db(detailed=False)
-        self._db.connect('uq_catalogue', 'postgres', '', 'localhost')
+        self._db.connect(settings.DATABASE['NAME'], settings.DATABASE['USER'],
+                         settings.DATABASE['PASSWORD'], settings.DATABASE['HOST'])
         self._logfile = None
 
         # development use only
@@ -42,16 +49,16 @@ class Pipeline(object):
 
     def run(self):
         """
-        Runs the entire migration process
+        Runs the pipeline
         :return: None
         """
         self._logfile = open('course_incompat.txt', 'w')
-        program_list = scrape.catalogue()
+        program_list = catalogue.catalogue()
 
-        print("\n************* INITIALISING MIGRATIONS *************\n")
+        print("\n************* INITIALISING PIPELINE *************\n")
 
         for program_code in program_list:
-            print('\nMIGRATING PROGRAM:', program_code)
+            print('\nLOADING PROGRAM:', program_code)
             print('\tScraping program...')
             program = self.add_program(program_code)
             print('\tBuilding course list...')
@@ -64,7 +71,7 @@ class Pipeline(object):
                 # if self._dev_plan_count > 1:
                     # return
                 # self._dev_plan_count += 1
-                print('\nMIGRATING PLAN:', plan['plan_code'])
+                print('\nLOADING PLAN:', plan['plan_code'])
 
                 print('\tScraping plan...')
                 plan = self.add_plan(plan['plan_code'], plan['title'])
@@ -73,7 +80,7 @@ class Pipeline(object):
                 self.add_plan_course_list(
                     plan['plan_code'], plan['course_list'])
 
-        print("\n************* MIGRATIONS COMPLETE *************\n")
+        print("\n************* PIPELINE COMPLETE *************\n")
 
     def add_program(self, program_code):
         """
@@ -88,7 +95,7 @@ class Pipeline(object):
             """ % program_code
         res = self._db.select(sql)
 
-        program = scrape.program(program_code)
+        program = program(program_code)
 
         if program is None:
             return None
@@ -111,7 +118,7 @@ class Pipeline(object):
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        course_list = scrape.program_course_list(program_code)
+        course_list = program_course_list(program_code)
 
         for course_code in course_list:
             # if self._dev_course_count > 5:
@@ -151,7 +158,7 @@ class Pipeline(object):
             """ % plan_code
         res = self._db.select(sql)
 
-        plan = scrape.plan(plan_code, plan_title)
+        plan = plan(plan_code, plan_title)
 
         if plan is None:
             return None
@@ -215,7 +222,7 @@ class Pipeline(object):
         if len(res) > 0:
             return False
 
-        course = scrape.course(course_code)
+        course = course(course_code)
         if course is None:
             sql = """
               INSERT INTO course
@@ -278,5 +285,5 @@ class Pipeline(object):
 
 if __name__ == "__main__":
     pipeline = Pipeline()
-    migration.reset()
+    pipeline.reset()
     pipeline.run()
