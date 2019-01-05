@@ -10,7 +10,8 @@ def get_soup(url):
     Makes a request to the given url and returns a BeautifulSoup instance of Soup
     """
     res = requests.get(url)
-    if len(res.content) < 10:
-        return None
 
-    return BeautifulSoup(res.content, "lxml")
+    if not res.content:
+        return None
+    soup = BeautifulSoup(res.content, "lxml")
+    return soup
