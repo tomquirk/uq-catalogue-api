@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 def get_soup(url):
     """
-    Makes a request to the given url and returns a BeautifulSoup instance of the html
+    Makes a request to the given url and returns a BeautifulSoup instance of Soup
     """
     res = requests.get(url)
     if len(res.content) < 10:

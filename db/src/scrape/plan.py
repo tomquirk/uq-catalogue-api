@@ -12,10 +12,8 @@ def plan(plan_code, plan_title):
     Scrapes basic data for given program
     :return: None
     """
-    # base_url = f'{settings.UQ_BASE_URL}/programs-courses/plan.html?acad_plan={plan_code}'
-
-    # soup = helpers.get_soup(base_url)
-    soup = BeautifulSoup(open('test/data/plan.html'), 'lxml')
+    base_url = f'{settings.UQ_BASE_URL}/programs-courses/plan.html?acad_plan={plan_code}'
+    soup = helpers.get_soup(base_url)
 
     plan_rules = get_plan_rules(plan_code)
 

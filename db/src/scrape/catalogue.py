@@ -17,9 +17,8 @@ def catalogue():
 
     program_list = []
 
-#     url = f'{settings.UQ_BASE_URL}/study/browse.html?level=ugpg'
-#     soup = helpers.get_soup(url)
-    soup = BeautifulSoup(open('test/data/catalogue.html'), "lxml")
+    url = f'{settings.UQ_BASE_URL}/study/browse.html?level=ugpg'
+    soup = helpers.get_soup(url)
 
     raw_programs = soup.find_all('a', href=re.compile("/study/program"))
     for raw_program in raw_programs:

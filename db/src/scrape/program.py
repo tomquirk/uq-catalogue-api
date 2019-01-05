@@ -6,16 +6,16 @@ import scrape.helpers as helpers
 import settings
 from bs4 import BeautifulSoup
 
+
 def program(program_code):
     """
 
     :param program_code: str, program code for given program (4 digits)
     :return: Dict, program details
     """
-
-    # url = f"{settings.UQ_BASE_URL}/study/program.html?acad_prog={program_code}"
-    # soup = helpers.get_soup(url)
-    soup = BeautifulSoup(open('test/data/program.html'), "lxml")
+    url = f"{settings.UQ_BASE_URL}/programs-courses/program.html?acad_prog={program_code}"
+    print(url)
+    soup = helpers.get_soup(url)
 
     program_title = soup.find(id="program-title").get_text()
 

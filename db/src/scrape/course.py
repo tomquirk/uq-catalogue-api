@@ -12,10 +12,8 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details
     """
-    # base_url = f'{settings.UQ_BASE_URL}/study/course.html?course_code={course_code}'
-
-    # soup = helpers.get_soup(base_url)
-    soup = BeautifulSoup(open('test/data/course.html'), 'lxml')
+    base_url = f'{settings.UQ_BASE_URL}/study/course.html?course_code={course_code}'
+    soup = helpers.get_soup(base_url)
 
     if soup is None or soup.find(id="course-notfound"):
         return None

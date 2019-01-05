@@ -8,6 +8,6 @@ DATABASE = {
     'PORT': os.getenv('DATABASE_PORT', '5432'),
 }
 
-UQ_BASE_URL = 'https://my.uq.edu.au/'
+UQ_BASE_URL = 'https://my.uq.edu.au'
 ENV = os.getenv('ENV_NAME', 'dev')
 PROGRAMS_WHITELIST = ['2030', '2342']   # list of program codes (str)
