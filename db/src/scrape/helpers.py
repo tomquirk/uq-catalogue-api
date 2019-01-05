@@ -13,4 +13,4 @@ def get_soup(url):
     if len(res.content) < 10:
         return None
 
-    return BeautifulSoup(res.content, "html.parser")
+    return BeautifulSoup(res.content, "lxml")

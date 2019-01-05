@@ -9,6 +9,7 @@ name = "pypi"
 requests = "*"
 "autopep8" = "*"
 "flake8" = "*"
+lxml = "*"
 
 [dev-packages]
 

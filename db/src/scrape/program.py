@@ -4,7 +4,7 @@ Program scraper
 import re
 import scrape.helpers as helpers
 import settings
-
+from bs4 import BeautifulSoup
 
 def program(program_code):
     """
@@ -13,16 +13,18 @@ def program(program_code):
     :return: Dict, program details
     """
 
-    url = f"{settings.UQ_BASE_URL}/study/program.html?acad_prog=" \
-        + str(program_code)
-    soup = helpers.get_soup(url)
+    # url = f"{settings.UQ_BASE_URL}/study/program.html?acad_prog={program_code}"
+    # soup = helpers.get_soup(url)
+    soup = BeautifulSoup(open('test/data/program.html'), "lxml")
+
+    program_title = soup.find(id="program-title").get_text()
 
     program_data = {
         'program_code': program_code,
-        'title': soup.find(id="program-title").get_text(),
-        'level': soup.find(id="program-title").get_text().split(' ')[0].lower(),
+        'title': program_title,
+        'level': program_title.split(' ')[0].lower(),
         'abbreviation': soup.find(id="program-abbreviation").get_text(),
-        'durationYears': int(soup.find(id="program-domestic-duration").get_text()[0]),
+        'durationYears': int(soup.find(id="program-domestic-duration").get_text().strip().split(' ')[0]),
         'units': int(soup.find(id="program-domestic-units").get_text()),
         'plan_list': [],
         'course_list': get_program_course_list(program_code)
@@ -51,7 +53,7 @@ def get_program_course_list(program_code):
     course_list = []
     # selection filter (program_code)
 
-    url = f'{settings.UQ_BASE_URL}study/program_list.html?acad_prog=%s' % program_code
+    url = f'{settings.UQ_BASE_URL}study/program_list.html?acad_prog={program_code}'
     soup = helpers.get_soup(url)
 
     raw_courses = soup.find_all("a", href=re.compile("course_code"))

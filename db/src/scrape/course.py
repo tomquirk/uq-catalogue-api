@@ -3,6 +3,8 @@ Course scraper
 """
 import scrape.helpers as helpers
 import settings
+from bs4 import BeautifulSoup
+
 
 def course(course_code):
     """
@@ -10,10 +12,10 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details
     """
-    base_url = f'{settings.UQ_BASE_URL}/study/course.html?course_code=%s' \
-        % course_code
+    # base_url = f'{settings.UQ_BASE_URL}/study/course.html?course_code={course_code}'
 
-    soup = helpers.get_soup(base_url)
+    # soup = helpers.get_soup(base_url)
+    soup = BeautifulSoup(open('test/data/course.html'), 'lxml')
 
     if soup is None or soup.find(id="course-notfound"):
         return None

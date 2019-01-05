@@ -9,3 +9,5 @@ DATABASE = {
 }
 
 UQ_BASE_URL = 'https://my.uq.edu.au/'
+ENV = os.getenv('ENV_NAME', 'dev')
+PROGRAMS_WHITELIST = ['2030', '2342']   # list of program codes (str)

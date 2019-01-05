@@ -5,11 +5,7 @@ Migrate
 import database
 import settings
 
-from scrape.course import course
-from scrape.catalogue import catalogue
-from scrape.plan import plan
-from scrape.program import program
-from scrape.program import get_program_course_list as program_course_list
+import scrape
 
 
 class Pipeline(object):
@@ -20,7 +16,9 @@ class Pipeline(object):
     def __init__(self):
         self._db = database.Db(detailed=False)
         self._db.connect(settings.DATABASE['NAME'], settings.DATABASE['USER'],
-                         settings.DATABASE['PASSWORD'], settings.DATABASE['HOST'])
+                         settings.DATABASE['PASSWORD'],
+                         settings.DATABASE['HOST']
+                         )
         self._logfile = None
 
         # development use only
@@ -53,7 +51,8 @@ class Pipeline(object):
         :return: None
         """
         self._logfile = open('course_incompat.txt', 'w')
-        program_list = catalogue()
+        program_list = scrape.catalogue()
+        print(program_list)
 
         print("\n************* INITIALISING PIPELINE *************\n")
 
@@ -95,7 +94,7 @@ class Pipeline(object):
             """ % program_code
         res = self._db.select(sql)
 
-        program = program(program_code)
+        program = scrape.program(program_code)
 
         if program is None:
             return None
@@ -105,8 +104,10 @@ class Pipeline(object):
         sql = """
               INSERT INTO program
               VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
-              """ % (program['program_code'], program['title'], program['level'],
-                     program['abbreviation'], program['durationYears'], program['units'])
+              """ % (program['program_code'], program['title'],
+                     program['level'], program['abbreviation'],
+                     program['durationYears'], program['units']
+                     )
 
         self._db.commit(sql)
 
@@ -118,7 +119,7 @@ class Pipeline(object):
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        course_list = program_course_list(program_code)
+        course_list = scrape.program_course_list(program_code)
 
         for course_code in course_list:
             # if self._dev_course_count > 5:
@@ -147,7 +148,8 @@ class Pipeline(object):
     def add_plan(self, plan_code, plan_title):
         """
 
-        :param plan_code: String, 5 letter plan key followed by 4 digit program code (e.g. SOFTWX2342)
+        :param plan_code: String, 5 letter plan key followed by 4 digit
+                            program code (e.g. SOFTWX2342)
         :param plan_title: String, plan title
         :return:
         """
@@ -158,7 +160,7 @@ class Pipeline(object):
             """ % plan_code
         res = self._db.select(sql)
 
-        plan = plan(plan_code, plan_title)
+        plan = scrape.plan(plan_code, plan_title)
 
         if plan is None:
             return None
@@ -177,8 +179,10 @@ class Pipeline(object):
     def add_plan_course_list(self, plan_code, plan_course_list):
         """
 
-        :param plan_code: String, 5 letter plan key followed by 4 digit program code (e.g. SOFTWX2342)
-        :param plan_course_list: List, containing Strings, all course codes (e.g. CSSE1001)
+        :param plan_code: String, 5 letter plan key followed by 4 digit
+                            program code (e.g. SOFTWX2342)
+        :param plan_course_list: List, containing Strings, all course codes
+                            (e.g. CSSE1001)
         :return: None
         """
         for course_code in plan_course_list:
@@ -206,7 +210,8 @@ class Pipeline(object):
     def add_course(self, course_code):
         """
 
-        :param course_code: String, 4 letters followed by 4 digits (e.g. MATH1051)
+        :param course_code: String, 4 letters followed by 4 digits
+                                (e.g. MATH1051)
         :return:
         """
 
@@ -222,7 +227,7 @@ class Pipeline(object):
         if len(res) > 0:
             return False
 
-        course = course(course_code)
+        course = scrape.course(course_code)
         if course is None:
             sql = """
               INSERT INTO course
@@ -235,11 +240,15 @@ class Pipeline(object):
 
         sql = """
               INSERT INTO course
-              VALUES ('%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', 'false')
+              VALUES ('%s', '%s', '%s', '%s', 
+              '%d', '%s', '%s', '%s', '%s', 'false')
               """ % (course['course_code'], course['title'],
                      course['description'], course['raw_prereqs'],
-                     course['units'], course['course_profile_id'], course['semester_offerings'][0],
-                     course['semester_offerings'][1], course['semester_offerings'][2])
+                     course['units'],
+                     course['course_profile_id'],
+                     course['semester_offerings'][0],
+                     course['semester_offerings'][1],
+                     course['semester_offerings'][2])
 
         self._db.commit(sql)
 
