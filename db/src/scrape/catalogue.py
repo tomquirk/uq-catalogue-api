@@ -4,7 +4,6 @@ Catalogue scraper
 import re
 import scrape.helpers as helpers
 import settings
-from bs4 import BeautifulSoup
 
 
 def catalogue():

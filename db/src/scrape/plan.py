@@ -4,7 +4,6 @@ Plan scraper
 import re
 import scrape.helpers as helpers
 import settings
-from bs4 import BeautifulSoup
 
 
 def plan(plan_code, plan_title):
@@ -37,10 +36,8 @@ def get_plan_rules(plan_code):
         'rules': []
     }
 
-    # base_url = f'{settings.UQ_BASE_URL}/programs-courses/plan_display.html?acad_plan={plan_code}'
-
-    # soup = helpers.get_soup(base_url)
-    soup = BeautifulSoup(open('test/data/plan_rules.html'), 'lxml')
+    base_url = f'{settings.UQ_BASE_URL}/programs-courses/plan_display.html?acad_plan={plan_code}'
+    soup = helpers.get_soup(base_url)
 
     # raw_rules = soup.find_all("div", "courselist")
 

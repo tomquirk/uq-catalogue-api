@@ -4,8 +4,6 @@ Program scraper
 import re
 import scrape.helpers as helpers
 import settings
-from bs4 import BeautifulSoup
-import requests
 
 
 def program(program_code):

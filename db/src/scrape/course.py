@@ -3,7 +3,6 @@ Course scraper
 """
 import scrape.helpers as helpers
 import settings
-from bs4 import BeautifulSoup
 
 
 def course(course_code):
