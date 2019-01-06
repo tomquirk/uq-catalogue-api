@@ -2,7 +2,8 @@
 Plan scraper
 """
 import re
-import scrape.helpers as helpers
+import src.scrape.helpers as helpers
+import src.settings as settings
 
 
 def plan(plan_code, plan_title):
@@ -10,18 +11,19 @@ def plan(plan_code, plan_title):
     Scrapes basic data for given program
     :return: None
     """
-    base_url = 'https://www.uq.edu.au/study/plan.html?acad_plan=%s' % plan_code
-
+    base_url = (
+        f"{settings.UQ_BASE_URL}/programs-courses/plan.html?acad_plan={plan_code}"
+    )
     soup = helpers.get_soup(base_url)
 
     plan_rules = get_plan_rules(plan_code)
 
     return {
-        'plan_code': plan_code,
-        'title': plan_title,
-        'program_code': soup.find(id="plan-field-key").get_text(),
-        'course_list': plan_rules['course_list'],
-        'rules': plan_rules['rules']
+        "plan_code": plan_code,
+        "title": plan_title,
+        "program_code": soup.find(id="plan-field-key").get_text(),
+        "course_list": plan_rules["course_list"],
+        "rules": plan_rules["rules"],
     }
 
 
@@ -31,28 +33,24 @@ def get_plan_rules(plan_code):
     :return:
     """
 
-    plan_rules = {
-        'course_list': [],
-        'rules': []
-    }
+    plan_rules = {"course_list": [], "rules": []}
 
-    base_url = 'https://www.uq.edu.au/study/plan_display.html?acad_plan=%s'\
-        % plan_code
-
+    base_url = f"{settings.UQ_BASE_URL}/programs-courses/plan_display.html?acad_plan={plan_code}"
     soup = helpers.get_soup(base_url)
+
     # raw_rules = soup.find_all("div", "courselist")
 
     # get courses
     raw_courses = soup.find_all("a", href=re.compile("course_code"))
-
     for course in raw_courses:
-
+        if not course:
+            continue
         raw_course = course.get_text().strip()
-        if raw_course not in plan_rules['course_list']:
-            plan_rules['course_list'].append(raw_course)
+        if raw_course not in plan_rules["course_list"]:
+            plan_rules["course_list"].append(raw_course)
 
     # for section in raw_rules:
-    #     rsoup = BeautifulSoup(str(section), "html.parser")
+    #     rsoup = BeautifulSoup(str(section), "lxml")
     #     rule = {
     #         'text': rsoup.find("p").get_text().strip().replace('\n', '<br>'),
     #         'courses': []

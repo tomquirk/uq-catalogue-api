@@ -1,0 +1,1851 @@
+<!-- https://my.uq.edu.au/programs-courses/program.html?acad_prog=2342 -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-212914-24"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-212914-24");
+    </script>
+    <!-- End Global site tag (gtag.js) - Google Analytics -->
+
+    <!-- Google Tag Manager -->
+    <script>
+      (function(w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-WMH69N");
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <title>
+      Bachelor of Engineering (Honours) - my.UQ - The University of Queensland,
+      Australia
+    </title>
+    <meta name="robots" content="ALL" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta
+      name="copyright"
+      content="Copyright (c) The University of Queensland"
+    />
+    <meta
+      name="description"
+      content="Programs, majors and courses details for current students at The University of Queensland."
+    />
+    <meta
+      name="keywords"
+      content="University of Queensland, UQ, Queensland university, Australian universities, Queensland universities, Brisbane, Australia"
+    />
+    <meta name="language" content="en" />
+
+    <link href="css/print.css" media="print" rel="stylesheet" type="text/css" />
+    <link
+      href="assets/assets.css?108"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <!--[if IE 8]>
+      <link
+        href="assets/ie8bugs.css"
+        media="screen"
+        rel="stylesheet"
+        type="text/css"
+    /><![endif]-->
+    <!--[if IE 7]>
+      <link
+        href="assets/ie7bugs.css"
+        media="screen"
+        rel="stylesheet"
+        type="text/css"
+    /><![endif]-->
+    <!--[if IE 6]>
+      <link
+        href="assets/ie6bugs.css"
+        media="screen"
+        rel="stylesheet"
+        type="text/css"
+    /><![endif]-->
+    <script
+      type="text/javascript"
+      src="//www.uq.edu.au/templates/web/include/ga.events.js"
+    ></script>
+
+    <script type="text/javascript" src="include/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="assets/manifest.js"></script>
+    <script type="text/javascript" src="assets/assets.js"></script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        button = document.getElementById("yearChange");
+        button.onclick = function() {
+          yearSelect = document.getElementById("filter");
+          selectedYear = yearSelect.value;
+
+          if (selectedYear >= 2014 && selectedYear <= 2019) {
+          } else {
+            form = document.getElementById("change-year");
+            form.action =
+              "https://www.uq.edu.au/courses-and-programs-archive/program.html";
+          }
+        };
+      }); //]]>
+    </script>
+    <script type="text/javascript">
+      //<![CDATA[
+
+      var startingPlace = null;
+
+      $(document).ready(function() {
+        //Hide (Collapse) the toggle containers on load
+        $(".toggle-container").hide();
+
+        //Switch the "Open" and "Close" state per click
+        $("h2.trigger").toggle(
+          function() {
+            $(this).addClass("active");
+          },
+          function() {
+            $(this).removeClass("active");
+          }
+        );
+
+        $("h2.trigger").click(function() {
+          $(this)
+            .next(".toggle-container")
+            .toggle();
+        });
+
+        $("ul.sf-menu").superfish({ speed: 1, dropShadows: true, delay: 100 });
+
+        $.history.init(historyCallback);
+        $("a[rel=history]").click(function() {
+          $.history.load(this.href.replace(/^.*#/, ""));
+          return false;
+        });
+
+        $("a[title]").qtip({
+          position: {
+            corner: {
+              target: "rightTop",
+              tooltip: "bottomLeft"
+            }
+          },
+          style: {
+            name: "cream",
+            tip: { corner: "bottomLeft" },
+            border: { width: 2 },
+            color: "#725725"
+          }
+        });
+      });
+
+      function historyCallback(hash) {
+        switch (hash) {
+          case "whatToStudy":
+          case "apply":
+          case "cost":
+          case "whatToDo":
+          case "rules":
+            // only do this on the first visit
+            if (startingPlace == null)
+              $("#" + hash)
+                .prev("h2.trigger")
+                .click();
+          case "":
+            // this happens at page init, so we need to find a starting place
+
+            if (startingPlace == null) {
+              // look at the cookie
+              nationality = $.cookie("uq.nationality");
+              if (nationality != null && nationality != "")
+                startingPlace = nationality;
+              else startingPlace = "australian";
+            }
+
+            historyCallback(startingPlace);
+            break;
+          case "international":
+            toggleNationality("international", "australian");
+            break;
+          case "australian":
+          default:
+            toggleNationality("australian", "international");
+            break;
+        }
+      }
+
+      function toggleNationality(on, off) {
+        $(".toggle-" + off).hide();
+        $(".toggle-" + on).show();
+        $("a.trigger-" + off).removeClass("active");
+        $("a.trigger-" + on).addClass("active");
+        $.cookie("uq.nationality", on, { path: "/" });
+      }
+
+      //]]>
+    </script>
+
+    <!-- START: Eloqua  -->
+    <script type="text/javascript">
+      var _elqQ = _elqQ || [];
+      _elqQ.push(["elqSetSiteId", "661931745"]);
+      _elqQ.push(["elqUseFirstPartyCookie", "engage.uq.edu.au"]);
+      _elqQ.push(["elqTrackPageView"]);
+      (function() {
+        function async_load() {
+          var s = document.createElement("script");
+          s.type = "text/javascript";
+          s.async = true;
+          s.src = "//img.en25.com/i/elqCfg.min.js";
+          var x = document.getElementsByTagName("script")[0];
+          x.parentNode.insertBefore(s, x);
+        }
+        if (window.addEventListener)
+          window.addEventListener("DOMContentLoaded", async_load, false);
+        else if (window.attachEvent) window.attachEvent("onload", async_load);
+      })();
+    </script>
+    <!-- END: Eloqua  -->
+
+    <link rel="shortcut icon" href="images/favicon.ico" />
+  </head>
+  <body>
+    <!--START: For Accessibility -->
+    <p id="top"><a href="#title" class="skip" accesskey="2">skip nav</a></p>
+    <!--END: For Accessibility -->
+    <!--START: Header -->
+    <div id="header">
+      <div id="header-inner">
+        <h1>
+          <a href="http://www.uq.edu.au/" title="Home" accesskey="1"
+            >The University of Queensland</a
+          >
+        </h1>
+        <h2><a href="https://my.uq.edu.au/" title="my.UQ">my.UQ</a></h2>
+        <div id="mininav">
+          <ul>
+            <li><a href="https://www.uq.edu.au/">UQ Home</a></li>
+            <li>
+              <a href="https://www.uq.edu.au/contacts" accesskey="3"
+                >Contacts</a
+              >
+            </li>
+            <li>
+              <a href="https://future-students.uq.edu.au/" accesskey="4"
+                >Study</a
+              >
+            </li>
+            <li><a href="https://maps.uq.edu.au/" accesskey="5">Maps</a></li>
+            <li><a href="https://www.uq.edu.au/news" accesskey="6">News</a></li>
+            <li>
+              <a href="https://www.uq.edu.au/events/" accesskey="7">Events</a>
+            </li>
+            <li>
+              <a href="https://www.library.uq.edu.au/" accesskey="8">Library</a>
+            </li>
+            <li><a href="https://my.uq.edu.au" accesskey="9">my.UQ</a></li>
+          </ul>
+          <div class="clear">&nbsp;</div>
+        </div>
+        <div id="search">
+          <form
+            id="searchbox"
+            method="get"
+            action="https://www.uq.edu.au/search"
+          >
+            <fieldset>
+              <legend>Search this site</legend>
+              <label for="search-entry">Search UQ</label>
+              <input
+                id="search-entry"
+                size="15"
+                type="text"
+                value="Search..."
+                name="q"
+                class="s"
+                onFocus="if (this.value == 'Search...') {this.value = '';}"
+                onBlur="if (this.value == '') {this.value = 'Search...';}"
+                tabindex="1"
+              />
+              <input
+                name="submit"
+                value="submit"
+                class="submit"
+                title="Search UQ"
+                type="submit"
+              />
+              <input type="hidden" name="output" value="xml_no_dtd" />
+              <input type="hidden" name="client" value="ws" />
+              <input type="hidden" name="proxystylesheet" value="ws" />
+              <input
+                type="hidden"
+                name="as_sitesearch"
+                value="https://my.uq.edu.au/programs-courses/"
+              />
+            </fieldset>
+          </form>
+        </div>
+        <div class="clear">&nbsp;</div>
+      </div>
+    </div>
+    <div id="topnav">
+      <div id="topnav-inner">
+        <ul>
+          <li><a href="https://my.uq.edu.au">Home</a></li>
+          <li>
+            <a href="https://www.uq.edu.au/startingatuq/">Starting at UQ </a>
+          </li>
+          <li>
+            <a href="http://my.uq.edu.au/programs-courses/"
+              >Programs and courses
+            </a>
+          </li>
+          <li>
+            <a href="http://www.uq.edu.au/departments/"
+              >Faculties and schools</a
+            >
+          </li>
+        </ul>
+        <div class="clear">&nbsp;</div>
+      </div>
+    </div>
+    <!--END: Header -->
+    <!-- START: Wrapper  -->
+    <div class="wrapper">
+      <!-- START: For accessibility -->
+      <div id="title"></div>
+      <!-- END: For accessibility -->
+
+      <div id="tool-wrapper">
+        <div id="breadcrumb">
+          <div class="breadcrumb-wrapper">
+            <ul>
+              <li class="first">
+                <a href="/programs-courses/index.html">Home</a>
+              </li>
+              <li>Bachelor of Engineering (Honours)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="tools">
+          <ul class="sf-menu">
+            <li class="icon">
+              <a href="#" onclick="window.print(); return false;" class="print"
+                >Print</a
+              >
+            </li>
+            <li class="icon">
+              <a href="feedback.html" class="feedback">Feedback</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- START: Content -->
+      <div id="content">
+        <style type="text/css">
+          #summary-content ol {
+            font-size: 0.8em;
+            margin: 0 0 0 15px;
+            padding: 0;
+          }
+
+          #summary-content .lower-alpha {
+            list-style-type: lower-latin;
+            list-style-type: lower-alpha;
+          }
+        </style>
+
+        <div id="page-head">
+          <h1>
+            <span id="program-title">Bachelor of Engineering (Honours)</span>
+            (<span id="program-abbreviation">BE(Hons)</span>)
+          </h1>
+
+          <div id="select-year">
+            <form
+              id="change-year"
+              method="get"
+              action="/programs-courses/program.html"
+            >
+              <input
+                type="hidden"
+                name="acad_prog"
+                value="2342"
+                id="acad_prog"
+              />
+              <label
+                >Show information for:
+
+                <select name="year" id="filter">
+                  <option value="2019" selected="selected">2019</option>
+                  <option value="2018">2018</option>
+                  <option value="2017">2017</option>
+                  <option value="2016">2016</option>
+                  <option value="2015">2015</option>
+                  <option value="2014">2014</option>
+                  <option value="2013">2013</option>
+                  <option value="2012">2012</option>
+                  <option value="2011">2011</option>
+                  <option value="2010">2010</option>
+                </select>
+              </label>
+              <button id="yearChange" type="submit" class="button tiny">
+                change
+              </button>
+            </form>
+          </div>
+          <p>
+            Information valid for students commencing
+            <span id="program-year">2019</span>
+          </p>
+        </div>
+
+        <!-- START: Content Primary -->
+        <div id="content-primary" class="program">
+          <div id="summary" class="program">
+            <div id="tabs">
+              <ul>
+                <li>
+                  <a
+                    href="#australian"
+                    class="trigger-australian"
+                    class="active"
+                    rel="history"
+                    >Australian</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#international"
+                    class="trigger-international"
+                    rel="history"
+                    >International</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div id="summary-content">
+              <div id="tab-container">
+                <div class="toggle-australian">
+                  <div class="panel">
+                    <h3>Duration</h3>
+
+                    <p id="program-domestic-duration">
+                      4 Years full-time (or part-time equivalent)
+                    </p>
+
+                    <h3>Commencing 2019</h3>
+                    <p id="program-domestic-commencement">
+                      Semester 1 (25 Feb, 2019)<br />Semester 2 (22 Jul, 2019)
+                    </p>
+
+                    <div class="left">
+                      <h3>Program level</h3>
+                      <p id="program-domestic-awardlevel">Undergraduate</p>
+                    </div>
+
+                    <div class="left">
+                      <h3>
+                        <a
+                          href="#"
+                          title="<strong>Units</strong> represent the value of individual courses which contribute to the total unit requirement of an academic program. A standard study load is 8 units per semester."
+                          class="tooltip"
+                          >Units</a
+                        >
+                      </h3>
+                      <p id="program-domestic-units">64</p>
+                    </div>
+
+                    <div class="left">
+                      <h3>
+                        <a
+                          href="#"
+                          title="A unique identifying number assigned to a program by the University."
+                          class="tooltip"
+                          >Program code</a
+                        >
+                      </h3>
+                      <p id="program-domestic-programcode">2342</p>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <h3>Faculty</h3>
+                    <p id="program-domestic-faculty">
+                      <a href="index.html?id=4406"
+                        >Engineering, Architecture & Information Technology</a
+                      >
+                    </p>
+
+                    <div class="left">
+                      <h3>Location</h3>
+                      <p id="program-domestic-location">St Lucia</p>
+                    </div>
+
+                    <h3>
+                      <a
+                        href="#"
+                        title="The way a program or course is delivered. Modes include <strong>internal</strong> (on-campus), <strong>external</strong> (off-campus or via distance education), or web based."
+                        class="tooltip"
+                        >Delivery mode</a
+                      >
+                    </h3>
+                    <p id="program-domestic-deliverymode">Internal</p>
+
+                    <div
+                      class="button-wrapper"
+                      id="program-domestic-courselist"
+                    >
+                      <p class="small" id="program-domestic-duration">
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                          class="button green"
+                        >
+                          Course list </a
+                        ><br /><br />
+                        View the
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                        >
+                          Course list</a
+                        >
+                        for courses that can be studied as part of the Bachelor
+                        of Engineering (Honours).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <h2>Entry requirements</h2>
+                    <span id="program-domestic-entryreq">
+                      <h3>
+                        <a
+                          href="#"
+                          title="<strong>OP</strong> is the Overall Position assigned to students who complete Queensland Year 12 studies in a certain number of subjects required by the Queensland Studies Authority."
+                          class="tooltip"
+                          >OP</a
+                        >/<a
+                          href="#"
+                          title="<strong>Entry ranks</strong> are allocated to university applicants who are not current year 12 students in Queensland (OP eligible). Entry ranks range from 1-99, with 99 being the highest obtainable. Rank is usually determined by academic results in the highest level of study completed. (If students have very little formal study other factors may be taken into consideration.)"
+                          class="tooltip"
+                          >Entry Rank</a
+                        >
+                        2018*
+                      </h3>
+                      <p id="program-domestic-op-actual">7/86</p>
+
+                      <p id="program-domestic-op-minmeet-label">
+                        Meeting minimum entry scores does not guarantee
+                        admission.
+                        <a
+                          href="https://future-students.uq.edu.au/node/14/domestic"
+                          id="program-domestic-op-minmeet-link"
+                          >Entry requirements</a
+                        >
+                        may change from year to year.
+                      </p>
+
+                      <p id="program-domestic-op-none">
+                        <a href="http://www.uq.edu.au/study/?page=1099"
+                          >Don't have the OP or rank?</a
+                        >
+                      </p>
+                      <p style="font-size:0.7em;">
+                        * OP/Entry Rank for entry into a program may change for
+                        2019 admissions.
+                      </p>
+
+                      <h3>
+                        <a
+                          href="#"
+                          title="<strong>Queensland Tertiary Admissions Centre</strong> (QTAC) is the central admissions body for all Queensland undergraduate programs. Australian year 12 students and International students taking year 12 in Australia apply through QTAC for entry into undergraduate programs."
+                          class="tooltip"
+                          >QTAC</a
+                        >
+                        Code(s)
+                      </h3>
+                      <p>
+                        717001 - B Engineering (Hons)<br />
+                        <span
+                          class="program-domestic-qtac-opguarantee"
+                          id="program-domestic-qtac-opguarantee-717001"
+                          >717001 - The
+                          <a
+                            href="https://future-students.uq.edu.au/apply/undergraduate/special-entry-programs/op-guarantee-scheme"
+                            class="program-domestic-qtac-opguarantee-url"
+                            id="program-domestic-qtac-opguarantee-url-717001"
+                            >UQ OP Guarantee Scheme</a
+                          >
+                          applies to this program</span
+                        ><br /><br />
+                      </p>
+                    </span>
+                    <h3>
+                      <a
+                        href="#"
+                        title="<strong>Prerequisites</strong> are specific subjects or courses that students need to have studied and passed at year 12 matriculation level or tertiary equivalent. Prerequisites vary between programs, and are intended to ensure that students can handle the program content. Prerequisites can be met through a variety of qualifications, such as secondary studies, bridging programs, tertiary study or alternative qualifications."
+                        class="tooltip"
+                        >Prerequisites</a
+                      >
+                    </h3>
+                    <p id="program-domestic-prereq">
+                      Queensland Year 12 or equivalent English, Mathematics B,
+                      plus one of Physics or Chemistry.
+                    </p>
+                    <p id="program-domestic-prereq-notmeet">
+                      <a href="http://www.uq.edu.au/study/?page=1099"
+                        >Don't have the subject requirements?</a
+                      >
+                    </p>
+                  </div>
+
+                  <div class="panel">
+                    <h2>AQF level</h2>
+                    <p id="program-domestic-aqf">AQF level 8</p>
+                  </div>
+
+                  <div class="panel">
+                    <h2>Fees for Australian students</h2>
+
+                    <div id="program-domestic-fees">
+                      <p>
+                        When you enrol each semester,
+                        <a href="https://www.sinet.uq.edu.au/" target="_blank"
+                          >mySI-net</a
+                        >
+                        will calculate your fees. An invoice with the fees for
+                        the current semester will generally be available for
+                        viewing on mySI-net overnight.
+                      </p>
+
+                      <p>
+                        If the invoice for a given semester or teaching period
+                        is not yet available, you can use the
+                        <a
+                          href="http://my.uq.edu.au/fee-schedules"
+                          target="_blank"
+                          >Fees Schedules</a
+                        >
+                        to estimate your fees. Please see the
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                          target="_blank"
+                          >course list</a
+                        >
+                        if you are unsure which courses you can do in your
+                        program.
+                      </p>
+
+                      <p>
+                        Fees for all students are reviewed annually in
+                        accordance with the University's
+                        <a
+                          href="http://ppl.app.uq.edu.au/content/3.40.01-student-fees"
+                          target="_blank"
+                          >Student Fees Policy</a
+                        >, and may increase from 1 January each year.
+                      </p>
+
+                      <p>
+                        If you are a prospective student, or if you haven't yet
+                        commenced your program, please see the
+                        <a
+                          href="https://future-students.uq.edu.au/study/program/Bachelor-of-Engineering-Honours-2342/domestic"
+                          target="_blank"
+                          >Future Students</a
+                        >
+                        website for fee information.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="panel" id="program-domestic-apply">
+                    <h2>How to apply</h2>
+                    <p>
+                      Applications must be lodged via the Queensland Tertiary
+                      Admissions Centre.
+                    </p>
+
+                    <!-- Suppress closing date if UQ College -->
+                    <h3>Closing Date</h3>
+                    <p>
+                      Please refer to the QTAC website (<a
+                        href="http://www.qtac.edu.au"
+                        >www.qtac.edu.au</a
+                      >) for details of closing dates for the submission of
+                      applications, documentation and changes of preference.
+                    </p>
+
+                    <!-- Suppress button if UQ College -->
+                    <a
+                      id="program-domestic-applyonline-link"
+                      href="https://future-students.uq.edu.au/apply/undergraduate/choose-your-program "
+                      class="button green"
+                    >
+                      <span id="program-domestic-applyonline-nonqtac"
+                        >How to apply</span
+                      >
+                    </a>
+                  </div>
+
+                  <div
+                    class="panel contact last"
+                    id="program-domestic-enquiries"
+                  >
+                    <h2>Enquiries for Australian students</h2>
+                    <p>
+                      Manager, Academic Administration, Faculty of Engineering,
+                      Architecture and Information Technology
+                    </p>
+                    <p>
+                      <strong>Email:</strong>
+                      <a href="mailto:enquiries@eait.uq.edu.au"
+                        >enquiries@eait.uq.edu.au</a
+                      >
+                    </p>
+                    <p><strong>Phone:</strong> 07 3365 4777</p>
+                    <p><strong>Web:</strong> <a href=""></a></p>
+                  </div>
+                </div>
+                <div class="toggle-international">
+                  <div class="panel">
+                    <h3>Duration</h3>
+                    <p id="program-international-duration">4 Years full-time</p>
+                    <h3>Commencing 2019</h3>
+                    <p id="program-international-commencing">
+                      Semester 1 (25 Feb, 2019)<br />Semester 2 (22 Jul, 2019)
+                    </p>
+
+                    <div class="left">
+                      <h3>Program level</h3>
+                      <p id="program-international-awardlevel">Undergraduate</p>
+                    </div>
+
+                    <div class="left">
+                      <h3>
+                        <a
+                          href="#"
+                          title="<strong>Units</strong> represent the value of individual courses which contribute to the total unit requirement of an academic program. A standard study load is 8 units per semester."
+                          class="tooltip"
+                          >Units</a
+                        >
+                      </h3>
+                      <p id="program-international-units">64</p>
+                    </div>
+
+                    <div class="left">
+                      <h3>
+                        <a
+                          href="#"
+                          title="A unique identifying number assigned to a program by the University."
+                          class="tooltip"
+                          >Program code</a
+                        >
+                      </h3>
+                      <p id="program-international-programcode">2342</p>
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <h3>Faculty</h3>
+                    <p id="program-international-faculty">
+                      <a href="index.html?id=4406"
+                        >Engineering, Architecture & Information Technology</a
+                      >
+                    </p>
+
+                    <div class="left">
+                      <h3>Location</h3>
+                      <p id="program-international-location">St Lucia</p>
+                    </div>
+
+                    <h3>
+                      <a
+                        href="#"
+                        title="The way a program or course is delivered. Modes include <strong>internal</strong> (on-campus), <strong>external</strong> (off-campus or via distance education), or web based."
+                        class="tooltip"
+                        >Delivery mode</a
+                      >
+                    </h3>
+                    <p id="program-international-deliverymode">Internal</p>
+
+                    <div class="button-wrapper">
+                      <p class="small" id="program-international-courselist">
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                          class="button green"
+                        >
+                          Course list </a
+                        ><br /><br />
+                        View the
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                        >
+                          Course list</a
+                        >
+                        for courses that can be studied as part of the Bachelor
+                        of Engineering (Honours).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <h2>Entry requirements</h2>
+
+                    <h3>
+                      <a
+                        href="#"
+                        title="<strong>Prerequisites</strong> are specific subjects or courses that students need to have studied and passed at year 12 matriculation level or tertiary equivalent. Prerequisites vary between programs, and are intended to ensure that students can handle the program content. Prerequisites can be met through a variety of qualifications, such as secondary studies, bridging programs, tertiary study or alternative qualifications."
+                        class="tooltip"
+                        >Prerequisites</a
+                      >
+                    </h3>
+                    <p id="program-international-entryreq">
+                      Queensland Year 12 or equivalent English, Mathematics B,
+                      plus one of Physics or Chemistry. View the
+                      <a href="index.html?page=65958" target="_blank"
+                        >equivalent qualifications</a
+                      >
+                      for international students.
+                    </p>
+
+                    <p id="program-international-cricos">
+                      <strong
+                        ><a
+                          href="#"
+                          title="The Commonwealth Register of Institutions and Courses for Overseas Students (CRICOS) Code indicates a registered program offered to international students studying in Australia on student visas."
+                          class="tooltip"
+                          >CRICOS Code</a
+                        >:</strong
+                      >
+                      080734K
+                    </p>
+                    <h3>English Proficiency</h3>
+                    <p id="program-international-englishpro">
+                      IELTS overall 6.5; reading 6; writing 6; speaking 6;
+                      listening 6. For other English Language Proficiency Tests
+                      and Scores approved for UQ, view the
+                      <a
+                        href="https://future-students.uq.edu.au/apply/english-language-proficiency-requirements"
+                        target="_blank"
+                        >English proficiency policy</a
+                      >.
+                    </p>
+                  </div>
+
+                  <div class="panel">
+                    <h2>AQF level</h2>
+                    <p id="program-international-aqf">AQF level 8</p>
+                  </div>
+
+                  <div class="panel">
+                    <h2>Fees for International students</h2>
+
+                    <div id="program-international-fees">
+                      <p>
+                        When you enrol each semester,
+                        <a href="https://www.sinet.uq.edu.au/" target="_blank"
+                          >mySI-net</a
+                        >
+                        will calculate your fees. An invoice with the fees for
+                        the current semester will generally be available for
+                        viewing on mySI-net overnight.
+                      </p>
+
+                      <p>
+                        If the invoice for a given semester or teaching period
+                        is not yet available, you can use the
+                        <a
+                          href="http://my.uq.edu.au/fee-schedules"
+                          target="_blank"
+                          >Fees Schedules</a
+                        >
+                        to estimate your fees. Please see the
+                        <a
+                          href="/programs-courses/program_list.html?acad_prog=2342"
+                          target="_blank"
+                          >course list</a
+                        >
+                        if you are unsure which courses you can do in your
+                        program.
+                      </p>
+
+                      <p>
+                        Fees for all students are reviewed annually in
+                        accordance with the University's
+                        <a
+                          href="http://ppl.app.uq.edu.au/content/3.40.01-student-fees"
+                          target="_blank"
+                          >Student Fees Policy</a
+                        >, and may increase from 1 January each year.
+                      </p>
+
+                      <p>
+                        If you are a prospective student, or if you haven't yet
+                        commenced your program, please see the
+                        <a
+                          href="https://future-students.uq.edu.au/study/program/Bachelor-of-Engineering-Honours-2342/international"
+                          target="_blank"
+                          >Future Students</a
+                        >
+                        website for fee information.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <h2>How to apply</h2>
+                    <p>
+                      Applications must be lodged via the Online Application
+                      Form.
+                    </p>
+
+                    <h3>Closing Date</h3>
+                    <p>
+                      To commence study in semester 2 - May 31 of the year of
+                      commencement.
+                    </p>
+                    <p>
+                      To commence study in semester 1 - November 30 of the
+                      previous year.
+                    </p>
+
+                    <p>
+                      <a
+                        id="program-international-applyonline-link"
+                        href="http://apply.uq.edu.au/"
+                        class="button green"
+                        ><span id="program-international-applyonline-span"
+                          >Apply Online</span
+                        ></a
+                      >
+                    </p>
+                  </div>
+
+                  <div
+                    class="panel contact last"
+                    id="program-international-enquiries"
+                  >
+                    <h2>Enquiries for International students</h2>
+                    <p>International Student Advisor</p>
+                    <p>
+                      <strong>Phone:</strong> Outside Australia: + 61 3 8676
+                      7004<Br />Within Australia (Free Call): 1800 671 980
+                    </p>
+                    <p><strong>Web:</strong> <a href=""></a></p>
+                    <p>
+                      <a
+                        href="https://future-students.uq.edu.au/enquire-online/intl"
+                        class="button green"
+                        >Enquire online</a
+                      >
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="description" class="program">
+            <h1 class="first">
+              Why study the Bachelor of Engineering (Honours)?
+            </h1>
+            <div class="usercontent">
+              <p>
+                The University of Queensland's engineering program offers the
+                largest choice of engineering programs in Queensland, with a
+                large number of distinct majors, double majors and minors. The
+                flexible curriculum equips students to work in both established
+                and newly emerging areas of engineering. Students develop their
+                understanding by applying science and engineering principles to
+                engineering problems of commercial importance. In addition to
+                technical expertise, the program emphasises essential workplace
+                skills such as communication, teamwork, project management,
+                problem-solving and lifelong learning.<br />The UQ engineering
+                degree is widely accredited and respected and this degree equips
+                students to work both in Australia and overseas.<br /><b
+                  >Note: Students enrolled in the Bachelor of Engineering prior
+                  to 2015 may refer to course and program information for
+                  previous years
+                  <a
+                    href="https://my.uq.edu.au/programs-courses/program.html?acad_prog=2001&year=2014"
+                  >
+                    here</a
+                  >.</b
+                >
+              </p>
+            </div>
+
+            <h2 class="trigger">
+              <a href="#whatToStudy">What you can study</a>
+            </h2>
+            <div id="whatToStudy" class="toggle-container">
+              <div class="block">
+                <div class="usercontent">
+                  <p>
+                    The range of options available through majors, dual and
+                    extended majors, minors or dual degrees, gives students the
+                    flexibility to pursue fields of study to the depth or
+                    breadth of knowledge required. Dual majors and minors are a
+                    set of courses that takes advantage of elective provisions
+                    within the program, thereby not lengthening the program
+                    duration. Extended majors offer a more concentrated program
+                    of study, while minors offer study in an area of engineering
+                    study additional to but complementary with the major. These
+                    study alternatives give students a competitive advantage in
+                    achieving their career aspirations. Most engineering majors
+                    can be undertaken as double majors or with a dual degree.
+                    With the majority of majors, students can also choose an
+                    additional minor (options are detailed in the individual
+                    majors outlines).
+                  </p>
+                </div>
+
+                <h1>Courses</h1>
+                <p>
+                  See the
+                  <a href="/programs-courses/program_list.html?acad_prog=2342">
+                    course list</a
+                  >
+                  for courses that can be studied as part of the Bachelor of
+                  Engineering (Honours).
+                </p>
+                <p>
+                  Click on the course code to view the Course Profile, for
+                  further information including advice of courses with shared
+                  teaching activities. Refer also to
+                  <a
+                    href="http://ppl.app.uq.edu.au/content/3.20.02-course-and-program-design"
+                    >PPL 3.20.02 Course and Program Design - Procedures</a
+                  >.
+                </p>
+
+                <h1>Majors/Specialisations</h1>
+                <p>
+                  Studies may be undertaken in the following specialisations.
+                  Please click on the major(s) that are of interest to you for
+                  more information.
+                </p>
+
+                <h2>Bachelor of Engineering (Honours)</h2>
+                <ul class="program-majors">
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CHEMIX2342"
+                      >Chemical Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=CHEMIY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CHBIOW2342"
+                      >Chemical and Biological Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CHENVW2342"
+                      >Chemical and Environmental Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CHMATW2342"
+                      >Chemical and Materials Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CHMETW2342"
+                      >Chemical and Metallurgical Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CIVILX2342"
+                      >Civil Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=CIVILY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CIENVW2342"
+                      >Civil and Environmental Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=CIVGEW2342"
+                      >Civil and Geotechnical Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=ELECTX2342"
+                      >Electrical Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=ELECTY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=ELBIOW2342"
+                      >Electrical and Biomedical Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=ELCOMW2342"
+                      >Electrical and Computer Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MECHAX2342"
+                      >Mechanical Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=MECHAY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MEAERW2342"
+                      >Mechanical and Aerospace Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MECMAW2342"
+                      >Mechanical and Materials Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MECTRY2342"
+                      >Mechatronic Engineering Extended Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MININX2342"
+                      >Mining Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=MININY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=MINGEW2342"
+                      >Mining and Geotechnical Engineering Dual Major</a
+                    >
+                  </li>
+                  <li>
+                    <a href="/programs-courses/plan.html?acad_plan=SOFTWX2342"
+                      >Software Engineering</a
+                    >
+                    /
+                    <span class="plan-type"
+                      ><a
+                        href="/programs-courses/plan.html?acad_plan=SOFTWY2342"
+                        >Extended Major</a
+                      ></span
+                    >
+                  </li>
+                </ul>
+
+                <h1>Placement courses</h1>
+                <div class="usercontent">
+                  <p>
+                    Completion of 450 hours of Engineering Professional Practice
+                    to satisfy the requirements of Engineers Australia.
+                  </p>
+                </div>
+
+                <h1>
+                  Dual degree programs for the Bachelor of Engineering (Honours)
+                </h1>
+                <ul class="program-duals">
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2346">
+                      Bachelors of Engineering (Honours)/Economics
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2344">
+                      Bachelors of Engineering (Honours)/Business Management
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2345">
+                      Bachelors of Engineering (Honours)/Commerce
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2343">
+                      Bachelors of Engineering (Honours)/Arts
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2401">
+                      Bachelors of Engineering (Honours)/Mathematics
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2428">
+                      Bachelors of Engineering (Honours)/Computer Science
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2347">
+                      Bachelors of Engineering (Honours)/Science
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2348">
+                      Bachelors of Engineering (Honours)/Biotechnology (Honours)
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/programs-courses/program.html?acad_prog=2349">
+                      Bachelors of Engineering (Honours)/Information Technology
+                    </a>
+                  </li>
+                </ul>
+
+                <h1>Honours</h1>
+                <p>Honours will be awarded to all graduates of this program.</p>
+              </div>
+            </div>
+
+            <h2 class="trigger"><a href="#apply">How to apply</a></h2>
+            <div id="apply" class="toggle-container">
+              <div class="block">
+                <div class="toggle-australian">
+                  <div class="swap-nationality">
+                    <a
+                      class="trigger-international"
+                      href="#international"
+                      rel="history"
+                      >View International<br />
+                      requirements
+                    </a>
+                  </div>
+                  <h1>Entry requirements for Australian students</h1>
+                  <p>
+                    <strong>
+                      <a
+                        href="#"
+                        title="<strong>OP</strong> is the Overall Position assigned to students who complete Queensland Year 12 studies in a certain number of subjects required by the Queensland Studies Authority."
+                        class="tooltip"
+                        >OP</a
+                      >/<a
+                        href="#"
+                        title="<strong>Entry ranks</strong> are allocated to university applicants who are not current year 12 students in Queensland (OP eligible). Entry ranks range from 1-99, with 99 being the highest obtainable. Rank is usually determined by academic results in the highest level of study completed. (If students have very little formal study other factors may be taken into consideration.)"
+                        class="tooltip"
+                        >Entry Rank</a
+                      >
+                      2018* </strong
+                    ><br />
+                    7/86
+                  </p>
+
+                  <p>
+                    * OP/Entry Rank for entry into a program may change for 2019
+                    admissions.
+                  </p>
+
+                  <p id="program-domestic-op-minmeet-rhs-label">
+                    Admission to all UQ programs is competitive - the number of
+                    places available is usually smaller than the number of
+                    people applying. For this reason, meeting minimum entry
+                    scores doesn't guarantee admission.
+                  </p>
+
+                  <p>
+                    <strong
+                      ><a
+                        href="#"
+                        title="<strong>Queensland Tertiary Admissions Centre</strong> (QTAC) is the central admissions body for all Queensland undergraduate programs. Australian year 12 students and International students taking year 12 in Australia apply through QTAC for entry into undergraduate programs."
+                        class="tooltip"
+                        >QTAC</a
+                      >
+                      Code(s)</strong
+                    ><br />
+
+                    717001 - B Engineering (Hons)<br />
+                  </p>
+
+                  <h2>
+                    <a
+                      href="#"
+                      title="<strong>Prerequisites</strong> are specific subjects or courses that students need to have studied and passed at year 12 matriculation level or tertiary equivalent. Prerequisites vary between programs, and are intended to ensure that students can handle the program content. Prerequisites can be met through a variety of qualifications, such as secondary studies, bridging programs, tertiary study or alternative qualifications."
+                      class="tooltip"
+                      >Prerequisites</a
+                    >
+                  </h2>
+                  <p>
+                    Queensland Year 12 or equivalent English, Mathematics B,
+                    plus one of Physics or Chemistry.
+                  </p>
+
+                  <h1>How to apply</h1>
+                  <p>
+                    Applications must be lodged via the Queensland Tertiary
+                    Admissions Centre.
+                  </p>
+
+                  <p>
+                    Click here for
+                    <a
+                      href="https://future-students.uq.edu.au/apply/undergraduate/choose-your-program"
+                    >
+                      application procedures for Australian students</a
+                    >.
+                  </p>
+
+                  <h2>Closing date</h2>
+                  <p>
+                    Please refer to the QTAC website (<a
+                      href="http://www.qtac.edu.au"
+                      >www.qtac.edu.au</a
+                    >) for details of closing dates for the submission of
+                    applications, documentation and changes of preference.
+                  </p>
+                </div>
+                <div class="toggle-international">
+                  <div class="swap-nationality">
+                    <a
+                      class="trigger-australian"
+                      href="#australian"
+                      rel="history"
+                      >View Australian<br />
+                      requirements</a
+                    >
+                  </div>
+                  <h1>Entry requirements for International students</h1>
+
+                  <h2>
+                    <a
+                      href="#"
+                      title="<strong>Prerequisites</strong> are specific subjects or courses that students need to have studied and passed at year 12 matriculation level or tertiary equivalent. Prerequisites vary between programs, and are intended to ensure that students can handle the program content. Prerequisites can be met through a variety of qualifications, such as secondary studies, bridging programs, tertiary study or alternative qualifications."
+                      class="tooltip"
+                      >Prerequisites</a
+                    >
+                  </h2>
+                  <p>
+                    Queensland Year 12 or equivalent English, Mathematics B,
+                    plus one of Physics or Chemistry.
+                  </p>
+
+                  <h2>Visa requirements</h2>
+                  <p id="program-international-cricos">
+                    <strong
+                      ><a
+                        href="#"
+                        title="The Commonwealth Register of Institutions and Courses for Overseas Students (CRICOS) Code indicates a registered program offered to international students studying in Australia on student visas."
+                        class="tooltip"
+                        >CRICOS Code</a
+                      >:</strong
+                    >
+                    080734K
+                  </p>
+                  <h2>English proficiency</h2>
+                  <p>
+                    IELTS overall 6.5; reading 6; writing 6; speaking 6;
+                    listening 6. For other English Language Proficiency Tests
+                    and Scores approved for UQ, View the
+                    <a
+                      href="https://future-students.uq.edu.au/apply/english-language-proficiency-requirements"
+                      >English proficiency policy</a
+                    >.
+                  </p>
+
+                  <h1>How to apply</h1>
+                  <p>
+                    Applications must be lodged via the Online Application Form.
+                  </p>
+
+                  <p>
+                    <a
+                      id="program-international-applyonline-link"
+                      href="http://apply.uq.edu.au/"
+                      class="button green"
+                      ><span id="program-international-applyonline-span"
+                        >Apply Online</span
+                      ></a
+                    >
+                  </p>
+
+                  <h2>Closing date</h2>
+                  <p>
+                    To commence study in semester 2 - May 31 of the year of
+                    commencement.
+                  </p>
+                  <p>
+                    To commence study in semester 1 - November 30 of the
+                    previous year.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <h2 class="trigger"><a href="#cost">What it costs</a></h2>
+            <div id="cost" class="toggle-container">
+              <div class="block">
+                <div class="toggle-australian">
+                  <div class="swap-nationality">
+                    <a
+                      class="trigger-international"
+                      href="#international"
+                      rel="history"
+                      >View International<br />
+                      fees and costs</a
+                    >
+                  </div>
+
+                  <h1>Fees for Australian students</h1>
+
+                  <div id="program-domestic-fees-right">
+                    <p>
+                      When you enrol each semester,
+                      <a href="https://www.sinet.uq.edu.au/" target="_blank"
+                        >mySI-net</a
+                      >
+                      will calculate your fees. An invoice with the fees for the
+                      current semester will generally be available for viewing
+                      on mySI-net overnight.
+                    </p>
+
+                    <p>
+                      If the invoice for a given semester or teaching period is
+                      not yet available, you can use the
+                      <a
+                        href="http://my.uq.edu.au/fee-schedules"
+                        target="_blank"
+                        >Fees Schedules</a
+                      >
+                      to estimate your fees. Please see the
+                      <a
+                        href="/programs-courses/program_list.html?acad_prog=2342"
+                        target="_blank"
+                        >course list</a
+                      >
+                      if you are unsure which courses you can do in your
+                      program.
+                    </p>
+
+                    <p>
+                      Fees for all students are reviewed annually in accordance
+                      with the University's
+                      <a
+                        href="http://ppl.app.uq.edu.au/content/3.40.01-student-fees"
+                        target="_blank"
+                        >Student Fees Policy</a
+                      >, and may increase from 1 January each year.
+                    </p>
+
+                    <p>
+                      If you are a prospective student, or if you haven't yet
+                      commenced your program, please see the
+                      <a
+                        href="https://future-students.uq.edu.au/study/program/Bachelor-of-Engineering-Honours-2342/domestic"
+                        target="_blank"
+                        >Future Students</a
+                      >
+                      website for fee information.
+                    </p>
+                  </div>
+                </div>
+                <div class="toggle-international">
+                  <div class="swap-nationality">
+                    <a
+                      class="trigger-australian"
+                      href="#australian"
+                      rel="history"
+                      >View Australian<br />
+                      fees and costs</a
+                    >
+                  </div>
+                  <h1>Fees for International students</h1>
+
+                  <div id="program-international-fees-right">
+                    <p>
+                      When you enrol each semester,
+                      <a href="https://www.sinet.uq.edu.au/" target="_blank"
+                        >mySI-net</a
+                      >
+                      will calculate your fees. An invoice with the fees for the
+                      current semester will generally be available for viewing
+                      on mySI-net overnight.
+                    </p>
+
+                    <p>
+                      If the invoice for a given semester or teaching period is
+                      not yet available, you can use the
+                      <a
+                        href="http://my.uq.edu.au/fee-schedules"
+                        target="_blank"
+                        >Fees Schedules</a
+                      >
+                      to estimate your fees. Please see the
+                      <a
+                        href="/programs-courses/program_list.html?acad_prog=2342"
+                        target="_blank"
+                        >course list</a
+                      >
+                      if you are unsure which courses you can do in your
+                      program.
+                    </p>
+
+                    <p>
+                      Fees for all students are reviewed annually in accordance
+                      with the University's
+                      <a
+                        href="http://ppl.app.uq.edu.au/content/3.40.01-student-fees"
+                        target="_blank"
+                        >Student Fees Policy</a
+                      >, and may increase from 1 January each year.
+                    </p>
+
+                    <p>
+                      If you are a prospective student, or if you haven't yet
+                      commenced your program, please see the
+                      <a
+                        href="https://future-students.uq.edu.au/study/program/Bachelor-of-Engineering-Honours-2342/international"
+                        target="_blank"
+                        >Future Students</a
+                      >
+                      website for fee information.
+                    </p>
+                  </div>
+                </div>
+
+                <h2>Additional costs</h2>
+                <ul>
+                  <li>Safety boots (AS2210) (up to $140)</li>
+                  <li>Hard hat (AS1801) ($15)</li>
+                  <li>
+                    Safety induction program ($40 with group, or $80 individual)
+                  </li>
+                  <li>
+                    Students who undertake vacation work, fieldwork or work
+                    experience will be required to fund their own travel and
+                    living expenses.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <h2 class="trigger">
+              <a href="#whatToDo"
+                >What you can do with a Bachelor of Engineering (Honours)</a
+              >
+            </h2>
+            <div id="whatToDo" class="toggle-container">
+              <div class="block">
+                <h1>Careers</h1>
+                <div class="usercontent">
+                  <p>
+                    The UQ engineering degree is highly regarded and employment
+                    prospects are excellent. Engineers find employment, as
+                    consultants, in the government and in many areas of business
+                    and industry. Detailed information about employment
+                    opportunities for different engineering specialisations is
+                    found in the Engineering Prospectus.
+                  </p>
+                </div>
+
+                <h1>
+                  <a
+                    href="#"
+                    title="Organisations that advocate and support the profession or speciality within the field."
+                    class="tooltip"
+                    >Professional memberships</a
+                  >
+                </h1>
+                <p>
+                  Graduates may be eligible for membership with the following
+                  organisations:
+                </p>
+                <ul>
+                  <li>Australian Computer Society</li>
+                  <li>Australasian Institute of Mining and Metallurgy</li>
+                  <li>Engineers Australia</li>
+                  <li>Institution of Chemical Engineers</li>
+                </ul>
+
+                <h1>
+                  <a
+                    href="#"
+                    title="The governing body that accredits the UQ program as a recognised pathway to become a professional in the field of study."
+                    class="tooltip"
+                    >Accrediting body</a
+                  >
+                </h1>
+                <p>This program has been accredited by:</p>
+                <ul>
+                  <li>Engineers Australia</li>
+                </ul>
+              </div>
+            </div>
+
+            <h2 class="trigger last">
+              <a href="#rules"
+                >Program requirements for the Bachelor of Engineering
+                (Honours)</a
+              >
+            </h2>
+            <div id="rules" class="toggle-container">
+              <div class="block">
+                <h1>To complete the Bachelor of Engineering (Honours)</h1>
+
+                <p>
+                  To fulfil the requirements of the Bachelor of Engineering
+                  (Honours), a student must complete the requisite number of
+                  courses chosen from the course list in accordance with the
+                  <a
+                    href="http://www.uq.edu.au/student/ProgramRules2019/2019-Bachelor-of-Engineering-Honours-2342.pdf"
+                    id="program-rules"
+                    >Program Rules</a
+                  >.
+                </p>
+
+                <div class="usercontent">
+                  <p>
+                    For more information on program requirements, please contact
+                    the Faculty.
+                  </p>
+                </div>
+
+                <p>
+                  Students should be aware of the University of Queensland
+                  policies and rules which govern the conduct of UQ programs.
+                  These may be found on the
+                  <a
+                    href="https://my.uq.edu.au/information-and-services/manage-my-program/uq-policies-and-rules"
+                    target="_blank"
+                    >UQ policies and rules</a
+                  >
+                  page on the
+                  <a
+                    href="https://my.uq.edu.au/information-and-services/manage-my-program/uq-policies-and-rules"
+                    target="_blank"
+                    >my.UQ website</a
+                  >.
+                </p>
+              </div>
+            </div>
+
+            <div id="apply-footer-international" class="toggle-international">
+              <p>&nbsp;</p>
+
+              <p>
+                <a
+                  id="program-international-applyonline-link"
+                  href="http://apply.uq.edu.au/"
+                  class="button green"
+                  ><span id="program-international-applyonline-span"
+                    >Apply Online</span
+                  ></a
+                >
+              </p>
+
+              <div id="MaintMessageStyleMiddle"></div>
+            </div>
+          </div>
+        </div>
+        <!-- END: Content -->
+
+        <!-- END: Content -->
+      </div>
+      <!-- END: Wrapper  -->
+    </div>
+    <!-- START: Footer  -->
+    <div id="footer">
+      <div class="wrapper">
+        <div id="siteinfo" class="vcard">
+          <div class="org fn">
+            <a href="https://www.uq.edu.au/">The University of Queensland</a>
+          </div>
+          <address id="uq-address" class="adr">
+            <span class="street-address">Brisbane</span>
+            <span class="locality">St Lucia</span>,
+            <span class="region">QLD</span>
+            <span class="postal-code">4072</span>
+          </address>
+          <div class="tel">+61 7 3365 1111</div>
+          <div class="campus">
+            Other Campuses: <br /><a
+              href="https://www.uq.edu
+			.au/gatton/"
+              >UQ Gatton</a
+            >,
+            <a href="https://www.uq.edu.au/about/herston-campus">UQ Herston</a>
+          </div>
+          <div class="directions">
+            <a href="https://maps.uq.edu.au/">Maps and Directions</a>
+          </div>
+          <div id="copyright">&copy; 2019 The University of Queensland</div>
+        </div>
+        <div id="footer-resources">
+          <h2>Supplemental Resources</h2>
+          <div id="navResources">
+            <h3>A Member of</h3>
+            <div class="member-logo">
+              <a href="http://www.universitiesaustralia.edu.au/"
+                ><img
+                  src="https://uq.edu.au/templates/web/images/logo-ua.gif"
+                  width="69"
+                  height="37"
+                  alt="Universities Australia"
+              /></a>
+              &nbsp;&nbsp;
+              <a href="http://www.universitas21.com/"
+                ><img
+                  src="https://uq.edu.au/templates/web/images/logo-universitas.gif"
+                  width="37"
+                  height="37"
+                  alt="Universitas 21"/></a
+              >&nbsp;&nbsp;
+              <a href="http://www.edx.org/"
+                ><img
+                  src="https://uq.edu.au/templates/web/images/logo-edx.gif"
+                  width="48"
+                  height="37"
+                  alt="edX"
+              /></a>
+              <a href="http://www.go8.edu.au/"
+                ><img
+                  src="https://uq.edu.au/templates/web/images/logo-go8.gif"
+                  width="123"
+                  height="18"
+                  alt="Group of Eight"
+              /></a>
+            </div>
+            <p>
+              <a href="https://www.uq.edu.au/terms-of-use/"
+                >Privacy &amp; Terms of use</a
+              >
+              | <a href="feedback.html">Feedback</a>
+            </p>
+            <br />
+            <p>Authorised by: Academic Registrar</p>
+            <p>ABN 63 942 912 684</p>
+            <p>
+              CRICOS Provider No:<a
+                class="footerlinks"
+                href="https://www.uq.edu
+        .au/about/cricos-link"
+                >00025B</a
+              >
+            </p>
+          </div>
+          <div id="navQuick">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="https://www.uq.edu.au/news/">For Media</a></li>
+              <li>
+                <a href="https://www.pf.uq.edu.au/emerg.html"
+                  >Emergency Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div id="navSocial">
+            <h3>Social Media</h3>
+            <ul class="social-links">
+              <li class="icon-facebook">
+                <a href="https://www.facebook.com/uniofqld">Facebook</a>
+              </li>
+              <li class="icon-twitter">
+                <a href="http://twitter.com/uq_news">Twitter</a>
+              </li>
+              <li class="icon-flickr">
+                <a href="http://www.flickr.com/photos/uqnews/sets/">Flickr</a>
+              </li>
+              <li class="icon-instagram">
+                <a href="http://instagram.com/uniofqld">Instagram</a>
+              </li>
+              <li class="icon-youtube">
+                <a href="https://www.youtube.com/universityqueensland"
+                  >YouTube</a
+                >
+              </li>
+              <li class="icon-vimeo">
+                <a href="http://vimeo.com/uq">Vimeo</a>
+              </li>
+              <li class="icon-itunesu">
+                <a href="http://www.uq.edu.au/itunes/">iTunes U</a>
+              </li>
+              <li class="icon-linkedin">
+                <a href="http://www.linkedin.com/edu/school?id=10238"
+                  >Linkedin</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div id="footer-right">
+          <div id="navExplore">
+            <h3>Explore</h3>
+            <ul>
+              <li><a href="https://uq.edu.au/giving">Giving to UQ</a></li>
+              <li>
+                <a href="https://www.uq.edu.au/departments/"
+                  >Faculties &amp; Divisions</a
+                >
+              </li>
+              <li><a href="https://www.uq.edu.au/staff/">UQ Jobs</a></li>
+              <li><a href="https://www.uq.edu.au/contacts/">UQ Contacts</a></li>
+              <li>
+                <a href="https://www.uq.edu.au/services/"
+                  >Services &amp; Facilities</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div id="navLogos">
+            <h3>Need Help?</h3>
+            <p>
+              <a href="https://www.uq.edu.au/uqanswers/" class="opacity-toggle">
+                UQ Answers
+              </a>
+            </p>
+            <h3>Emergency</h3>
+            <p>Ph. 3365 3333</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- to capture body call to focus on search bar -->
+    <div id="SearchUQ" class="hidden">&nbsp;</div>
+    <!-- END: Footer  -->
+  </body>
+</html>

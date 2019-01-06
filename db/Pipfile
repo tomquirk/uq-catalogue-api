@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"beautifulsoup4" = "*"
+"psycopg2" = "*"
+requests = "*"
+lxml = "*"
+tqdm = "*"
+
+[dev-packages]
+black = "*"
+pylint = "*"
+ipdb = "*"
+
+[requires]
+python_version = "3.7"

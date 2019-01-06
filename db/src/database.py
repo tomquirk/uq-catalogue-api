@@ -5,7 +5,7 @@ Database Utility
 import psycopg2
 
 
-class Db(object):
+class Db:
     """
     Mini wrapper for database interaction
     """
@@ -19,12 +19,16 @@ class Db(object):
         """ Establishes connection with psql server
         """
         try:
-            connect_str = "dbname='%s' user='%s' host='%s' password='%s'" % \
-                (dbname, username, host, password)
+            connect_str = "dbname='%s' user='%s' host='%s' password='%s'" % (
+                dbname,
+                username,
+                host,
+                password,
+            )
             self._conn = psycopg2.connect(connect_str)
             self._cursor = self._conn.cursor()
-        except Exception as e:
-            print("Error connecting to database\n", e)
+        except Exception as error:
+            print("Error connecting to database\n", error)
 
     def select(self, query):
         """ execution suitable for read queries, returning the rows returned from given query.
