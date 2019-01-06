@@ -16,10 +16,12 @@ class Pipeline(object):
 
     def __init__(self):
         self._db = database.Db(detailed=False)
-        self._db.connect(settings.DATABASE['NAME'], settings.DATABASE['USER'],
-                         settings.DATABASE['PASSWORD'],
-                         settings.DATABASE['HOST']
-                         )
+        self._db.connect(
+            settings.DATABASE["NAME"],
+            settings.DATABASE["USER"],
+            settings.DATABASE["PASSWORD"],
+            settings.DATABASE["HOST"],
+        )
         self._logfile = None
 
         # development use only
@@ -31,16 +33,17 @@ class Pipeline(object):
         Clears DB, truncating each table in order of dependency
         :return: None
         """
-        check = input('Are you sure you want to wipe the DB? [Y/n] ')
-        if check.lower() != 'y':
+        check = input("Are you sure you want to wipe the DB? [Y/n] ")
+        if check.lower() != "y":
             return
 
         queries = [
-            'DELETE from plan_course_list',
-            'DELETE from program_course_list',
-            'DELETE from incompatible_courses',
-            'DELETE from course', 'DELETE from plan',
-            'DELETE from program'
+            "DELETE from plan_course_list",
+            "DELETE from program_course_list",
+            "DELETE from incompatible_courses",
+            "DELETE from course",
+            "DELETE from plan",
+            "DELETE from program",
         ]
 
         for sql in queries:
@@ -51,34 +54,32 @@ class Pipeline(object):
         Runs the pipeline
         :return: None
         """
-        self._logfile = open('incompatible_courses.txt', 'w')
+        self._logfile = open("incompatible_courses.txt", "w")
         program_list = scrape.catalogue()
         print(program_list)
 
         print("\n************* INITIALISING PIPELINE *************\n")
 
         for program_code in program_list:
-            print('\nLOADING PROGRAM:', program_code)
-            print('\tScraping program...')
+            print("\nLOADING PROGRAM:", program_code)
+            print("\tScraping program...")
             program = self.add_program(program_code)
-            print('\tBuilding course list...')
+            print("\tBuilding course list...")
             self.add_program_course_list(program_code)
 
             if program is None:
                 return
 
-            for plan in program['plan_list']:
+            for plan in program["plan_list"]:
                 # if self._dev_plan_count > 1:
-                    # return
+                # return
                 # self._dev_plan_count += 1
-                print('\nLOADING PLAN:', plan['plan_code'])
+                print("\nLOADING PLAN:", plan["plan_code"])
 
-                print('\tScraping plan...')
-                plan = self.add_plan(plan['plan_code'], plan['title'])
-                print('\tBuilding course list... Size:',
-                      len(plan['course_list']))
-                self.add_plan_course_list(
-                    plan['plan_code'], plan['course_list'])
+                print("\tScraping plan...")
+                plan = self.add_plan(plan["plan_code"], plan["title"])
+                print("\tBuilding course list... Size:", len(plan["course_list"]))
+                self.add_plan_course_list(plan["plan_code"], plan["course_list"])
 
         print("\n************* PIPELINE COMPLETE *************\n")
 
@@ -88,11 +89,14 @@ class Pipeline(object):
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        sql = """
+        sql = (
+            """
             SELECT program_code
             FROM program
             WHERE program_code = '%s'
-            """ % program_code
+            """
+            % program_code
+        )
         res = self._db.select(sql)
 
         program = scrape.program(program_code)
@@ -105,10 +109,14 @@ class Pipeline(object):
         sql = """
               INSERT INTO program
               VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
-              """ % (program['program_code'], program['title'],
-                     program['level'], program['abbreviation'],
-                     program['durationYears'], program['units']
-                    )
+              """ % (
+            program["program_code"],
+            program["title"],
+            program["level"],
+            program["abbreviation"],
+            program["durationYears"],
+            program["units"],
+        )
 
         self._db.commit(sql)
 
@@ -124,7 +132,7 @@ class Pipeline(object):
 
         for course_code in tqdm(course_list):
             # if self._dev_course_count > 5:
-                # return
+            # return
             # self._dev_course_count += 1
 
             course = self.add_course(course_code)
@@ -140,7 +148,12 @@ class Pipeline(object):
                       FROM program_course_list
                       WHERE course_code = '%s' AND program_code = '%s'
                   );
-                  """ % (course_code, program_code, course_code, program_code)
+                  """ % (
+                course_code,
+                program_code,
+                course_code,
+                program_code,
+            )
 
             self._db.commit(sql)
 
@@ -154,11 +167,14 @@ class Pipeline(object):
         :param plan_title: String, plan title
         :return:
         """
-        sql = """
+        sql = (
+            """
             SELECT plan_code
             FROM plan
             WHERE plan_code = '%s'
-            """ % plan_code
+            """
+            % plan_code
+        )
         res = self._db.select(sql)
 
         plan = scrape.plan(plan_code, plan_title)
@@ -171,7 +187,11 @@ class Pipeline(object):
         sql = """
               INSERT INTO plan
               VALUES ('%s', '%s', '%s')
-              """ % (plan['plan_code'], plan['program_code'], plan['title'])
+              """ % (
+            plan["plan_code"],
+            plan["program_code"],
+            plan["title"],
+        )
 
         self._db.commit(sql)
 
@@ -188,7 +208,7 @@ class Pipeline(object):
         """
         for course_code in tqdm(plan_course_list):
             # if self._dev_course_count > 20:
-                # return
+            # return
             # self._dev_course_count += 1
 
             course = self.add_course(course_code)
@@ -204,7 +224,12 @@ class Pipeline(object):
                     FROM plan_course_list
                     WHERE course_code = '%s' AND plan_code = '%s'
                 );
-                """ % (course_code, plan_code, course_code, plan_code)
+                """ % (
+                course_code,
+                plan_code,
+                course_code,
+                plan_code,
+            )
 
             self._db.commit(sql)
 
@@ -219,22 +244,28 @@ class Pipeline(object):
         # Check for db entry for course. Don't scrape it if yes
         if len(course_code) != 8:
             return None
-        sql = """
+        sql = (
+            """
             SELECT course_code
             FROM course
             WHERE course_code = '%s'
-            """ % course_code
+            """
+            % course_code
+        )
         res = self._db.select(sql)
         if len(res) > 0:
             return False
 
         course = scrape.course(course_code)
         if course is None:
-            sql = """
+            sql = (
+                """
               INSERT INTO course
               (course_code, invalid)
               VALUES ('%s', 'true')
-              """ % course_code
+              """
+                % course_code
+            )
 
             self._db.commit(sql)
             return None
@@ -243,18 +274,21 @@ class Pipeline(object):
               INSERT INTO course
               VALUES ('%s', '%s', '%s', '%s', 
               '%d', '%s', '%s', '%s', '%s', 'false')
-              """ % (course['course_code'], course['title'],
-                     course['description'], course['raw_prereqs'],
-                     course['units'],
-                     course['course_profile_id'],
-                     course['semester_offerings'][0],
-                     course['semester_offerings'][1],
-                     course['semester_offerings'][2])
+              """ % (
+            course["course_code"],
+            course["title"],
+            course["description"],
+            course["raw_prereqs"],
+            course["units"],
+            course["course_profile_id"],
+            course["semester_offerings"][0],
+            course["semester_offerings"][1],
+            course["semester_offerings"][2],
+        )
 
         self._db.commit(sql)
 
-        self.add_incompatible_courses(
-            course_code, course["incompatible_courses"])
+        self.add_incompatible_courses(course_code, course["incompatible_courses"])
 
         return course
 
@@ -270,7 +304,7 @@ class Pipeline(object):
 
         for i_course_code in incompatible_courses:
             if len(i_course_code) != 8:
-                self._logfile.write(course_code + '\n')
+                self._logfile.write(course_code + "\n")
                 continue
             # Ensure all courses are added to `course` table
             self.add_course(i_course_code)
@@ -280,7 +314,10 @@ class Pipeline(object):
                 FROM incompatible_courses
                 WHERE course_code = '%s'
                 AND incompatible_course_code = '%s'
-                """ % (course_code, i_course_code)
+                """ % (
+                course_code,
+                i_course_code,
+            )
             res = self._db.select(sql)
             if len(res) > 0:
                 continue
@@ -288,7 +325,10 @@ class Pipeline(object):
             sql = """
                   INSERT INTO incompatible_courses
                   VALUES ('%s', '%s')
-                  """ % (course_code, i_course_code)
+                  """ % (
+                course_code,
+                i_course_code,
+            )
 
             self._db.commit(sql)
 

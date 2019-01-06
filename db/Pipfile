@@ -7,13 +7,13 @@ name = "pypi"
 "beautifulsoup4" = "*"
 "psycopg2" = "*"
 requests = "*"
-"autopep8" = "*"
-"flake8" = "*"
 lxml = "*"
-ipdb = "*"
 tqdm = "*"
 
 [dev-packages]
+black = "*"
+pylint = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.7"
