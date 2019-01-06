@@ -12,7 +12,6 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details
     """
-    print(course_code)
     base_url = f'{settings.UQ_BASE_URL}/programs-courses/course.html?course_code={course_code}'
     soup = helpers.get_soup(base_url)
 
@@ -43,7 +42,8 @@ def course(course_code):
     invalid_match = 'This course is not currently offered, please contact the school.'
     # case for deprecated courses w/ no units (e.g. COMP1500) or other determining factors
     if course_details['units'] < 1 or invalid_match in parent_description_elem:
-        print('\t\tCOURSE NOT VALID: %s' % course_code)
+        logfile = open(settings.INVALID_COURSES_FILEPATH, 'w')
+        logfile.write(course_code + '\n')
         return None
 
     try:

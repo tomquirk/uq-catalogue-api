@@ -11,6 +11,7 @@ requests = "*"
 "flake8" = "*"
 lxml = "*"
 ipdb = "*"
+tqdm = "*"
 
 [dev-packages]
 

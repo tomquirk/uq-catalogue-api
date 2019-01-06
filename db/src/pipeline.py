@@ -6,6 +6,7 @@ import database
 import settings
 
 import scrape
+from tqdm import tqdm
 
 
 class Pipeline(object):
@@ -50,7 +51,7 @@ class Pipeline(object):
         Runs the pipeline
         :return: None
         """
-        self._logfile = open('course_incompat.txt', 'w')
+        self._logfile = open('incompatible_courses.txt', 'w')
         program_list = scrape.catalogue()
         print(program_list)
 
@@ -107,7 +108,7 @@ class Pipeline(object):
               """ % (program['program_code'], program['title'],
                      program['level'], program['abbreviation'],
                      program['durationYears'], program['units']
-                     )
+                    )
 
         self._db.commit(sql)
 
@@ -121,7 +122,7 @@ class Pipeline(object):
         """
         course_list = scrape.program_course_list(program_code)
 
-        for course_code in course_list:
+        for course_code in tqdm(course_list):
             # if self._dev_course_count > 5:
                 # return
             # self._dev_course_count += 1
@@ -185,7 +186,7 @@ class Pipeline(object):
                             (e.g. CSSE1001)
         :return: None
         """
-        for course_code in plan_course_list:
+        for course_code in tqdm(plan_course_list):
             # if self._dev_course_count > 20:
                 # return
             # self._dev_course_count += 1
