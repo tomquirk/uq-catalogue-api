@@ -12,5 +12,5 @@ UQ_BASE_URL = "https://my.uq.edu.au"
 ENV = os.getenv("ENV_NAME", "dev")
 PROGRAMS_WHITELIST = ["2030", "2342"]  # list of program codes (str)
 
-INVALID_COURSES_FILEPATH = "invalid_courses.txt"
-INCOMPATIBLE_COURSES_FILEPATH = "incompatible_courses.txt"
+INVALID_COURSES_FILEPATH = "src/invalid_courses.txt"
+INCOMPATIBLE_COURSES_FILEPATH = "src/incompatible_courses.txt"

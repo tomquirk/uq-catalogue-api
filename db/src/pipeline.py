@@ -1,15 +1,13 @@
 """
 Migrate
 """
-
-import database
-import settings
-
-import scrape
 from tqdm import tqdm
+import src.database as database
+import src.scrape as scrape
+import src.settings as settings
 
 
-class Pipeline(object):
+class Pipeline:
     """
     Utility class for ETL pipeline
     """
@@ -33,7 +31,9 @@ class Pipeline(object):
         Clears DB, truncating each table in order of dependency
         :return: None
         """
-        check = input("Are you sure you want to wipe the DB? [Y/n] ")
+        check = input(
+            "Wipe database and start over (WARNING: this will remove all existing data in the database)? [Y/n] "
+        )
         if check.lower() != "y":
             return
 
@@ -99,11 +99,13 @@ class Pipeline(object):
         )
         res = self._db.select(sql)
 
+        # TODO should have a unified way to trigger refreshes
         program = scrape.program(program_code)
 
         if program is None:
             return None
-        elif len(res) > 0:
+
+        if res:
             return program
 
         sql = """
@@ -181,7 +183,8 @@ class Pipeline(object):
 
         if plan is None:
             return None
-        elif len(res) > 0:
+
+        if res:
             return plan
 
         sql = """
@@ -253,10 +256,13 @@ class Pipeline(object):
             % course_code
         )
         res = self._db.select(sql)
-        if len(res) > 0:
+        if res:
+            # dont need course object for anything, so just return nothing
             return False
 
         course = scrape.course(course_code)
+
+        # # add invalid course to db
         if course is None:
             sql = (
                 """
@@ -319,7 +325,7 @@ class Pipeline(object):
                 i_course_code,
             )
             res = self._db.select(sql)
-            if len(res) > 0:
+            if res:
                 continue
 
             sql = """

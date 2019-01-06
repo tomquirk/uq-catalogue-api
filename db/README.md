@@ -38,7 +38,7 @@ $ pipenv install
 ### 3.0 Run the scraper
 
 ```
-$ python pipeline.py
+$ python -m src.pipeline
 ```
 
 Get a coffee, this might take a while...

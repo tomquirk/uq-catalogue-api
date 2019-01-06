@@ -1,8 +1,8 @@
 """
 Course scraper
 """
-import scrape.helpers as helpers
-import settings
+import src.scrape.helpers as helpers
+import src.settings as settings
 
 
 def course(course_code):
@@ -84,9 +84,10 @@ def course(course_code):
     return course_details
 
 
-def scrape_cp(course_soup):
-    """
-    Gets course profile info
-    :return:
-    """
-    return None
+# TODO implement course profile scraper
+# def scrape_cp(course_soup):
+#     """
+#     Gets course profile info
+#     :return:
+#     """
+#     return None

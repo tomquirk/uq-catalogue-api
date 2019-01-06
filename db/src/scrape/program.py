@@ -2,8 +2,8 @@
 Program scraper
 """
 import re
-import scrape.helpers as helpers
-import settings
+import src.scrape.helpers as helpers
+import src.settings as settings
 
 
 def program(program_code):
