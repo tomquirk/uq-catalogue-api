@@ -16,7 +16,7 @@ def catalogue():
 
     program_list = []
 
-    url = f"{settings.UQ_BASE_URL}/study/browse.html?level=ugpg"
+    url = "https://future-students.uq.edu.au/study/find-a-program/listing/undergraduate"
     soup = helpers.get_soup(url)
 
     raw_programs = soup.find_all("a", href=re.compile("/study/program"))

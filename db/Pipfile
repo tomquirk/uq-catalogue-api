@@ -9,6 +9,8 @@ name = "pypi"
 requests = "*"
 lxml = "*"
 tqdm = "*"
+pandas = "*"
+html5lib = "*"
 
 [dev-packages]
 black = "*"

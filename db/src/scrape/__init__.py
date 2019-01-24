@@ -2,6 +2,7 @@
 Scraper for all
 """
 from .course import course
+from .course_profile import course_profile
 from .catalogue import catalogue
 from .plan import plan
 from .program import program

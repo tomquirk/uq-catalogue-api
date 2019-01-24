@@ -17,17 +17,29 @@ def program(program_code):
     )
     soup = helpers.get_soup(url)
 
-    program_title = soup.find(id="program-title").get_text()
+    program_title = soup.find(id="program-title")
+    if program_title:
+        program_title = program_title.get_text()
+
+    abbreviation = soup.find(id="program-abbreviation")
+    if abbreviation: 
+        abbreviation = abbreviation.get_text()
+
+    durationYears = soup.find(id="program-domestic-duration")
+    if durationYears:
+        durationYears = float(durationYears.get_text().strip().split(" ")[0])
+
+    units = soup.find(id="program-domestic-units")
+    if units:
+        units = int(units.get_text())
 
     program_data = {
         "program_code": program_code,
         "title": program_title,
         "level": program_title.split(" ")[0].lower(),
-        "abbreviation": soup.find(id="program-abbreviation").get_text(),
-        "durationYears": int(
-            soup.find(id="program-domestic-duration").get_text().strip().split(" ")[0]
-        ),
-        "units": int(soup.find(id="program-domestic-units").get_text()),
+        "abbreviation": abbreviation,
+        "durationYears": durationYears,
+        "units": units,
         "plan_list": [],
         "course_list": get_program_course_list(program_code),
     }
