@@ -31,15 +31,20 @@ def course(course_code):
         if "\n" in course_summary:
             course_summary = course_summary.split("\n")[0]
 
+    title = soup.find(id="course-title")
+    if title:
+        title = title.get_text()[:-11].replace("'", "''")
+
     course_details = {
         "course_code": course_code,
-        "title": soup.find(id="course-title").get_text()[:-11].replace("'", "''"),
+        "title": title,
         "description": course_summary,
         "units": int(soup.find(id="course-units").get_text()),
         "semester_offerings": ["false", "false", "false"],
     }
 
-    parent_description_elem = soup.find(id="description").contents[1].get_text()
+    parent_description_elem = soup.find(
+        id="description").contents[1].get_text()
     invalid_match = "This course is not currently offered, please contact the school."
     # case for deprecated courses w/ no units (e.g. COMP1500) or other determining factors
     if course_details["units"] < 1 or invalid_match in parent_description_elem:
@@ -48,7 +53,8 @@ def course(course_code):
         return None
 
     try:
-        course_details["raw_prereqs"] = soup.find(id="course-prerequisite").get_text()
+        course_details["raw_prereqs"] = soup.find(
+            id="course-prerequisite").get_text()
     except AttributeError:
         course_details["raw_prereqs"] = None
 
@@ -82,12 +88,3 @@ def course(course_code):
         course_details["course_profile_id"] = 0
 
     return course_details
-
-
-# TODO implement course profile scraper
-# def scrape_cp(course_soup):
-#     """
-#     Gets course profile info
-#     :return:
-#     """
-#     return None

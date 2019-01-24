@@ -55,6 +55,22 @@ CREATE TABLE course (
 ALTER TABLE course OWNER TO postgres;
 
 --
+-- Name: course_assessment; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE course_assessment (
+    id SERIAL,
+    course_code character(8) NOT NULL, 
+    assessment_name text,
+    due_date text,
+    weighting text,
+    learning_obj text
+)
+
+ALTER TABLE course_assessment OWNER TO postgres;
+
+
+--
 -- Name: incompatible_courses; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -100,7 +116,7 @@ CREATE TABLE program (
     program_code character(4) NOT NULL,
     title character(100),
     level character(45),
-    abbreviation character(20),
+    abbreviation character(40),
     duration_years integer,
     units integer
 );
@@ -167,6 +183,12 @@ ALTER TABLE ONLY program_course_list
 ALTER TABLE ONLY program
     ADD CONSTRAINT program_pkey PRIMARY KEY (program_code);
 
+--
+-- Name: course_assessment course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY course_assessment
+    ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course(course_code);
 
 --
 -- Name: plan_course_list course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres

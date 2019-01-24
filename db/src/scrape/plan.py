@@ -16,12 +16,20 @@ def plan(plan_code, plan_title):
     )
     soup = helpers.get_soup(base_url)
 
+    if not soup:
+        return
+
     plan_rules = get_plan_rules(plan_code)
+
+    program_code = soup.find(id="plan-field-key")
+
+    if program_code:
+        program_code = program_code.get_text()
 
     return {
         "plan_code": plan_code,
         "title": plan_title,
-        "program_code": soup.find(id="plan-field-key").get_text(),
+        "program_code": program_code,
         "course_list": plan_rules["course_list"],
         "rules": plan_rules["rules"],
     }

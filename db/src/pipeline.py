@@ -1,10 +1,11 @@
 """
 Migrate
 """
-from tqdm import tqdm
 import src.database as database
 import src.scrape as scrape
 import src.settings as settings
+from src.scrape.plan import get_plan_rules
+from src.scrape.program import get_program_course_list
 
 
 class Pipeline:
@@ -41,6 +42,7 @@ class Pipeline:
             "DELETE from plan_course_list",
             "DELETE from program_course_list",
             "DELETE from incompatible_courses",
+            "DELETE from course_assessment",
             "DELETE from course",
             "DELETE from plan",
             "DELETE from program",
@@ -78,8 +80,10 @@ class Pipeline:
 
                 print("\tScraping plan...")
                 plan = self.add_plan(plan["plan_code"], plan["title"])
-                print("\tBuilding course list... Size:", len(plan["course_list"]))
-                self.add_plan_course_list(plan["plan_code"], plan["course_list"])
+                print("\tBuilding course list... Size:",
+                      len(plan["course_list"]))
+                self.add_plan_course_list(
+                    plan["plan_code"], plan["course_list"])
 
         print("\n************* PIPELINE COMPLETE *************\n")
 
@@ -91,13 +95,27 @@ class Pipeline:
         """
         sql = (
             """
-            SELECT program_code
+            SELECT *
             FROM program
             WHERE program_code = '%s'
             """
             % program_code
         )
         res = self._db.select(sql)
+
+        if res:
+            program_data = {
+                "program_code": res[0][0],
+                "title": res[0][1],
+                "level": res[0][2],
+                "abbreviation": res[0][3],
+                "durationYears": res[0][4],
+                "units": res[0][5],
+                "plan_list": [],
+                "course_list": get_program_course_list(res[0][0]),
+            }
+
+            return program_data
 
         # TODO should have a unified way to trigger refreshes
         program = scrape.program(program_code)
@@ -108,11 +126,15 @@ class Pipeline:
         if res:
             return program
 
+        title = program["title"]
+        level = program["level"]
+        abbreviation = program["abbreviation"]
+
         sql = """
               INSERT INTO program
               VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
               """ % (
-            program["program_code"],
+            program_code,
             program["title"],
             program["level"],
             program["abbreviation"],
@@ -132,7 +154,7 @@ class Pipeline:
         """
         course_list = scrape.program_course_list(program_code)
 
-        for course_code in tqdm(course_list):
+        for course_code in course_list:
             # if self._dev_course_count > 5:
             # return
             # self._dev_course_count += 1
@@ -171,13 +193,24 @@ class Pipeline:
         """
         sql = (
             """
-            SELECT plan_code
+            SELECT *
             FROM plan
             WHERE plan_code = '%s'
             """
             % plan_code
         )
         res = self._db.select(sql)
+
+        if res:
+            plan_rules = get_plan_rules(plan_code)
+
+            return {
+                "plan_code": res[0][0],
+                "title": res[0][2],
+                "program_code": res[0][1],
+                "course_list": plan_rules["course_list"],
+                "rules": plan_rules["rules"],
+            }
 
         plan = scrape.plan(plan_code, plan_title)
 
@@ -209,7 +242,7 @@ class Pipeline:
                             (e.g. CSSE1001)
         :return: None
         """
-        for course_code in tqdm(plan_course_list):
+        for course_code in plan_course_list:
             # if self._dev_course_count > 20:
             # return
             # self._dev_course_count += 1
@@ -249,16 +282,20 @@ class Pipeline:
             return None
         sql = (
             """
-            SELECT course_code
+            SELECT course_code, course_profile_id
             FROM course
             WHERE course_code = '%s'
             """
             % course_code
         )
         res = self._db.select(sql)
+        print(course_code)
         if res:
-            # dont need course object for anything, so just return nothing
-            return False
+            profile_id = res[0][1]
+            if profile_id:
+                # dont need course object for anything, so just return nothing
+                self.add_course_profile(course_code, profile_id)
+            return None
 
         course = scrape.course(course_code)
 
@@ -276,15 +313,27 @@ class Pipeline:
             self._db.commit(sql)
             return None
 
+        title = course.get("title", '')
+        if title:
+            title = title.replace("'", "''")
+
+        description = course.get("description", '')
+        if description:
+            description = description.replace("'", "''")
+
+        raw_prereqs = course.get("raw_prereqs", '')
+        if raw_prereqs:
+            raw_prereqs = raw_prereqs.replace("'", "''")
+
         sql = """
               INSERT INTO course
               VALUES ('%s', '%s', '%s', '%s', 
               '%d', '%s', '%s', '%s', '%s', 'false')
               """ % (
             course["course_code"],
-            course["title"],
-            course["description"],
-            course["raw_prereqs"],
+            title,
+            description,
+            raw_prereqs,
             course["units"],
             course["course_profile_id"],
             course["semester_offerings"][0],
@@ -294,9 +343,45 @@ class Pipeline:
 
         self._db.commit(sql)
 
-        self.add_incompatible_courses(course_code, course["incompatible_courses"])
+        self.add_incompatible_courses(
+            course_code, course["incompatible_courses"])
+        return True
 
-        return course
+    def add_course_profile(self, course_code, course_profile_id):
+        sql = (
+            """
+            SELECT course_code
+            FROM course_assessment
+            WHERE course_code = '%s'
+            """
+            % course_code
+        )
+        res = self._db.select(sql)
+
+        if res:
+            return
+
+        course_profile = scrape.course_profile(course_code, course_profile_id)
+
+        if not course_profile:
+            return
+
+        for assessment in course_profile:
+            print(assessment.get("name").replace("'", "''"))
+            sql = """
+                INSERT INTO course_assessment (course_code, assessment_name, due_date, weighting, learning_obj)
+                VALUES ('%s', '%s', '%s', '%s', '%s')
+                """ % (
+                assessment.get("course_code"),
+                assessment.get("name").replace("'", "''"),
+                assessment.get("due_date").replace("'", "''"),
+                assessment.get("weighting"),
+                assessment.get("learning_obj"),
+            )
+
+            self._db.commit(sql)
+
+        return course_profile
 
     def add_incompatible_courses(self, course_code, incompatible_courses):
         """
