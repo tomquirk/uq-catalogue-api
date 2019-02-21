@@ -187,11 +187,21 @@ ALTER TABLE ONLY program
     ADD CONSTRAINT program_pkey PRIMARY KEY (program_code);
 
 --
+-- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY course_profile
+    ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code) ON DELETE CASCADE;
+
+--
 -- Name: course_assessment course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY course_assessment
-    ADD CONSTRAINT "course_profile.course_profile_id" FOREIGN KEY (course_profile_id) REFERENCES course_profile (course_profile_id);
+    ADD CONSTRAINT "course_profile.course_profile_id"
+    FOREIGN KEY (course_profile_id)
+    REFERENCES course_profile (course_profile_id)
+    ON DELETE CASCADE;
 
 --
 -- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
@@ -206,13 +216,6 @@ ALTER TABLE ONLY course_to_plan
 
 ALTER TABLE ONLY plan_to_program
     ADD CONSTRAINT "plan.plan_code" FOREIGN KEY (plan_code) REFERENCES plan (plan_code);
-
---
--- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY course_profile
-    ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code);
 
 --
 -- Name: incompatible_courses course_code_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
