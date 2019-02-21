@@ -346,7 +346,6 @@ class Pipeline:
         last_course_code_prefix = None
 
         for i_course_code in incompatible_courses:
-            i_course_code = i_course_code.strip().replace("(", "").replace(")", "")
             if len(i_course_code) == 8:
                 last_course_code_prefix = i_course_code[:4]
             if len(i_course_code) == 4:

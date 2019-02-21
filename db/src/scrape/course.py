@@ -79,6 +79,10 @@ def course(course_code):
             .replace(" or ", ", ")
             .replace(" & ", ", ")
             .replace("; ", ", ")
+            .replace(" + ", ", ")
+            .replace("/", ", ")
+            .replace("(", "")
+            .replace(")", "")
             .split(", ")
         )
 
