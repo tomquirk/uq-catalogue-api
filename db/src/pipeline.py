@@ -340,8 +340,14 @@ class Pipeline:
         :param incompatible_courses: List, course code/s as Strings
         :return:
         """
+        _LOG.info(f"Flagging incompatible courses: {course_code} <=/=> {str(incompatible_courses)}")
+        last_course_code_prefix = None
 
         for i_course_code in incompatible_courses:
+            if len(i_course_code) == 8:
+                last_course_code_prefix = i_course_code[:4]
+            if len(i_course_code) == 4:
+                i_course_code = f"{last_course_code_prefix}i_course_code"
             # Ensure all courses are added to `course` table
             course = self.get_or_add_course(i_course_code)
             if course is None:
