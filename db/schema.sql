@@ -86,16 +86,8 @@ CREATE TABLE incompatible_courses (
 
 CREATE TABLE plan (
     plan_code character (10) NOT NULL,
+    program_code character (4) NOT NULL,
     title character (100) NOT NULL
-);
-
---
--- Name: plan_to_program; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE plan_to_program (
-    plan_code character (10) NOT NULL,
-    program_code character (4) NOT NULL
 );
 
 --
@@ -162,13 +154,6 @@ ALTER TABLE ONLY plan
 -- Name: plan plan_to_program_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY plan_to_program
-    ADD CONSTRAINT plan_to_program_pk PRIMARY KEY (plan_code, program_code);
-
---
--- Name: plan plan_to_program_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
 ALTER TABLE ONLY course_profile
     ADD CONSTRAINT course_profile_pk PRIMARY KEY (course_profile_id);
 
@@ -211,13 +196,6 @@ ALTER TABLE ONLY course_to_plan
     ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code);
 
 --
--- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY plan_to_program
-    ADD CONSTRAINT "plan.plan_code" FOREIGN KEY (plan_code) REFERENCES plan (plan_code);
-
---
 -- Name: incompatible_courses course_code_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -251,6 +229,9 @@ ALTER TABLE ONLY course_to_plan
 
 ALTER TABLE ONLY course_to_program
     ADD CONSTRAINT programcodefk FOREIGN KEY (program_code) REFERENCES program (program_code);
+
+ALTER TABLE ONLY plan
+    ADD CONSTRAINT program_code_fk FOREIGN KEY (program_code) REFERENCES program (program_code);
 
 --
 -- PostgreSQL database dump complete

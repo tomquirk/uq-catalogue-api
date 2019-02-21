@@ -46,7 +46,6 @@ class Pipeline:
             "DELETE from course_profile",
             "DELETE from course_assessment",
             "DELETE from course",
-            "DELETE from plan_to_program",
             "DELETE from plan",
             "DELETE from program",
         ]
@@ -72,7 +71,9 @@ class Pipeline:
 
             for plan in program["plans"]:
                 plan_code = plan["plan_code"]
-                plan = self.get_or_add_plan(plan_code, plan["title"])
+                plan = self.get_or_add_plan(
+                    plan_code, program["program_code"], plan["title"]
+                )
                 if not plan:
                     continue
 
@@ -110,9 +111,7 @@ class Pipeline:
             stmt = """
                 SELECT *
                 FROM plan
-                INNER JOIN plan_to_program
-                ON plan_to_program.plan_code = plan.plan_code
-                WHERE plan_to_program.program_code = (%s)
+                WHERE program_code = (%s)
                 """
             res = self._db.select(stmt, data=(program_code,))
 
@@ -143,14 +142,6 @@ class Pipeline:
             ),
         )
 
-        for plan_code in program["plans"]:
-            stmt = """
-              INSERT INTO plan_to_program
-              VALUES (%s, %s)
-              """
-
-            self._db.commit(stmt, data=(plan_code, program_code))
-
         return program
 
     def add_courses_to_program(self, program_code, courses):
@@ -174,7 +165,7 @@ class Pipeline:
 
         return courses
 
-    def get_or_add_plan(self, plan_code, plan_title):
+    def get_or_add_plan(self, plan_code, program_code, plan_title):
         """
 
         :param plan_code: String, 5 letter plan key followed by 4 digit
