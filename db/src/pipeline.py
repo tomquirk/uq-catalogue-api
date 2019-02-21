@@ -236,7 +236,7 @@ class Pipeline:
             return
 
         sql = """
-            SELECT course_code, course_profile_id
+            SELECT course_code
             FROM course
             WHERE course_code = (%s)
             """
@@ -246,9 +246,6 @@ class Pipeline:
         if res:
             # Could scrape course profile here, but
             # probably safe to assume we've got it
-            course_profile_id = res[0][1]
-            if course_profile_id:
-                self.refresh_course_profile(course_code, course_profile_id)
             return {"course_code": course_code}
 
         course = scrape.course(course_code)
@@ -282,7 +279,7 @@ class Pipeline:
         sql = """
               INSERT INTO course
               VALUES (%s, %s, %s, %s, 
-              %s, %s, %s, %s, %s, %s)
+              %s, %s, %s, %s, %s)
               """
 
         self._db.commit(
@@ -293,7 +290,6 @@ class Pipeline:
                 description,
                 raw_prereqs,
                 course["units"],
-                course["course_profile_id"],
                 course["semester_offerings"][0],
                 course["semester_offerings"][1],
                 course["semester_offerings"][2],
