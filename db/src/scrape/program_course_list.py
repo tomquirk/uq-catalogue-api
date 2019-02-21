@@ -5,8 +5,7 @@ import src.settings as settings
 
 def program_course_list(program_code):
     """
-    Scrapes list of programs identified by title and program code
-    :return: List object, containing dictionaries of program details
+    Scrapes list of courses for given program identified by title and program code
     """
     course_list = []
     # selection filter (program_code)

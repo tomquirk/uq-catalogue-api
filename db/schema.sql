@@ -48,11 +48,15 @@ CREATE TABLE course (
     description text,
     raw_prerequisites text,
     units integer,
-    course_profile_id integer,
     semester_1 boolean,
     semester_2 boolean,
     summer_semester boolean,
     not_offered boolean
+);
+
+CREATE TABLE course_profile (
+    course_profile_id character (10) NOT NULL,
+    course_code character (8) NOT NULL
 );
 
 --
@@ -61,7 +65,7 @@ CREATE TABLE course (
 
 CREATE TABLE course_assessment (
     id SERIAL,
-    course_code character (8) NOT NULL,
+    course_profile_id character (10) NOT NULL,
     assessment_name text,
     due_date timestamp,
     weighting float,
@@ -82,8 +86,16 @@ CREATE TABLE incompatible_courses (
 
 CREATE TABLE plan (
     plan_code character (10) NOT NULL,
-    program_code character (4) NOT NULL,
     title character (100) NOT NULL
+);
+
+--
+-- Name: plan_to_program; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE plan_to_program (
+    plan_code character (10) NOT NULL,
+    program_code character (4) NOT NULL
 );
 
 --
@@ -147,6 +159,20 @@ ALTER TABLE ONLY plan
     ADD CONSTRAINT planpk PRIMARY KEY (plan_code);
 
 --
+-- Name: plan plan_to_program_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY plan_to_program
+    ADD CONSTRAINT plan_to_program_pk PRIMARY KEY (plan_code, program_code);
+
+--
+-- Name: plan plan_to_program_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY course_profile
+    ADD CONSTRAINT course_profile_pk PRIMARY KEY (course_profile_id);
+
+--
 -- Name: course_to_program course_to_program_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -165,13 +191,27 @@ ALTER TABLE ONLY program
 --
 
 ALTER TABLE ONLY course_assessment
-    ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code);
+    ADD CONSTRAINT "course_profile.course_profile_id" FOREIGN KEY (course_profile_id) REFERENCES course_profile (course_profile_id);
 
 --
 -- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY course_to_plan
+    ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code);
+
+--
+-- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY plan_to_program
+    ADD CONSTRAINT "plan.plan_code" FOREIGN KEY (plan_code) REFERENCES plan (plan_code);
+
+--
+-- Name: course_to_plan course.course_code; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY course_profile
     ADD CONSTRAINT "course.course_code" FOREIGN KEY (course_code) REFERENCES course (course_code);
 
 --

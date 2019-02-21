@@ -35,14 +35,16 @@ def course(course_code):
         if "\n" in course_summary:
             course_summary = course_summary.split("\n")[0]
 
-    parent_description_elem = soup.find(id="description").contents[1].get_text()
-    not_offered_match = (
-        "This course is not currently offered, please contact the school."
-    )
-
-    # return false if course not offerred
-    if not_offered_match in parent_description_elem:
-        return False
+    try:
+        parent_description_elem = soup.find(id="description").contents[1].get_text()
+        not_offered_match = (
+            "This course is not currently offered, please contact the school."
+        )
+        # return false if course not offerred
+        if not_offered_match in parent_description_elem:
+            return False
+    except Exception:
+        pass
 
     raw_units = soup.find(id="course-units").get_text()
 

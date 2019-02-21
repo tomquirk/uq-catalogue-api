@@ -10,6 +10,10 @@ from src.logger import get_logger
 _LOG = get_logger("pipeline")
 
 
+def to_plan(sql_res):
+    return ({"plan_code": sql_res[0], "title": sql_res[2], "program_code": sql_res[1]},)
+
+
 class Pipeline:
     """
     Utility class for ETL pipeline
@@ -64,7 +68,7 @@ class Pipeline:
             program_course_list = scrape.program_course_list(program_code)
             self.add_courses_to_program(program_code, program_course_list)
 
-            for plan in program_course_list:
+            for plan in program["plans"]:
                 plan_code = plan["plan_code"]
                 plan = self.get_or_add_plan(plan_code, plan["title"])
                 if not plan:
@@ -91,16 +95,29 @@ class Pipeline:
         res = self._db.select(stmt, data=(program_code,))
 
         if res:
-            program_data = {
+            program = {
                 "program_code": res[0][0],
                 "title": res[0][1],
                 "level": res[0][2],
                 "abbreviation": res[0][3],
                 "durationYears": res[0][4],
                 "units": res[0][5],
+                "plans": [],
             }
 
-            return program_data
+            stmt = """
+                SELECT *
+                FROM plan
+                INNER JOIN plan_to_program
+                ON plan_to_program.plan_code = plan.plan_code
+                WHERE plan_to_program.program_code = (%s)
+                """
+            res = self._db.select(stmt, data=(program_code,))
+
+            for i in res:
+                program["plans"].append(to_plan(i))
+
+            return program
 
         program = scrape.program(program_code)
 
@@ -170,7 +187,7 @@ class Pipeline:
         res = self._db.select(sql, data=(plan_code,))
 
         if res:
-            {"plan_code": res[0][0], "title": res[0][2], "program_code": res[0][1]},
+            return to_plan(res[0])
 
         plan = scrape.plan(plan_code)
 
@@ -232,9 +249,17 @@ class Pipeline:
         if res:
             profile_id = res[0][1]
             if profile_id:
-                self.refresh_course_profile(course_code, profile_id)
-            # TODO should return a course object here instead of nothing
-            return True
+                sql = """
+                    SELECT *
+                    FROM course_assessment
+                    WHERE profile_id = (%s)
+                    """
+
+                res = self._db.select(sql, data=(profile_id,))
+                if not res:
+                    self.refresh_course_profile(course_code, profile_id)
+
+            return {"course_code": course_code}
 
         course = scrape.course(course_code)
 
@@ -288,7 +313,6 @@ class Pipeline:
 
         self.add_incompatible_courses(course_code, course["incompatible_courses"])
 
-        # TODO return an actual course object here
         return {"course_code": course_code}
 
     def refresh_course_profile(self, course_code, course_profile_id):
