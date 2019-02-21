@@ -43,8 +43,10 @@ class Pipeline:
             "DELETE from course_to_plan",
             "DELETE from course_to_program",
             "DELETE from incompatible_courses",
+            "DELETE from course_profile",
             "DELETE from course_assessment",
             "DELETE from course",
+            "DELETE from plan_to_program",
             "DELETE from plan",
             "DELETE from program",
         ]
@@ -234,7 +236,6 @@ class Pipeline:
         """
         _LOG.info(f"Getting course: {course_code}")
 
-        # Check for db entry for course. Don't scrape it if yes
         if len(course_code) != 8:
             return
 
@@ -247,18 +248,11 @@ class Pipeline:
         res = self._db.select(sql, data=(course_code,))
 
         if res:
-            profile_id = res[0][1]
-            if profile_id:
-                sql = """
-                    SELECT *
-                    FROM course_assessment
-                    WHERE profile_id = (%s)
-                    """
-
-                res = self._db.select(sql, data=(profile_id,))
-                if not res:
-                    self.refresh_course_profile(course_code, profile_id)
-
+            # Could scrape course profile here, but
+            # probably safe to assume we've got it
+            course_profile_id = res[0][1]
+            if course_profile_id:
+                self.refresh_course_profile(course_code, course_profile_id)
             return {"course_code": course_code}
 
         course = scrape.course(course_code)
@@ -313,20 +307,35 @@ class Pipeline:
 
         self.add_incompatible_courses(course_code, course["incompatible_courses"])
 
+        course_profile_id = course["course_profile_id"]
+        if course_profile_id:
+            self.refresh_course_profile(course_code, course_profile_id)
+
         return {"course_code": course_code}
 
     def refresh_course_profile(self, course_code, course_profile_id):
         _LOG.info(f"Refreshing course profile: {course_code}")
         sql = """
-            DELETE FROM course_assessment
+            DELETE FROM course_profile
             WHERE course_code = (%s)
+            AND course_profile_id = (%s)
             """
-        self._db.commit(sql, data=(course_code,))
+        self._db.commit(sql, data=(course_code, course_profile_id))
 
         course_profile = scrape.course_profile(course_code, course_profile_id)
 
         if not course_profile:
             return
+
+        sql = """
+            INSERT INTO course_profile (course_profile_id, course_code)
+            VALUES (
+                %s,
+                %s
+            )
+            """
+
+        self._db.commit(sql, data=(course_profile_id, course_code))
 
         for assessment in course_profile:
             due_date_str = None
@@ -334,7 +343,7 @@ class Pipeline:
                 due_date_str = assessment.get("due_date").isoformat()
 
             sql = """
-                INSERT INTO course_assessment (course_code, assessment_name, due_date, weighting, learning_obj)
+                INSERT INTO course_assessment (course_profile_id, assessment_name, due_date, weighting, learning_obj)
                 VALUES (
                     %s,
                     %s,
@@ -347,7 +356,7 @@ class Pipeline:
             self._db.commit(
                 sql,
                 data=(
-                    assessment["course_code"],
+                    course_profile_id,
                     assessment["name"].replace("'", "''"),
                     due_date_str,
                     assessment["weighting"],

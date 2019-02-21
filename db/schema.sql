@@ -55,7 +55,7 @@ CREATE TABLE course (
 );
 
 CREATE TABLE course_profile (
-    course_profile_id character (10) NOT NULL,
+    course_profile_id integer,
     course_code character (8) NOT NULL
 );
 
@@ -65,7 +65,7 @@ CREATE TABLE course_profile (
 
 CREATE TABLE course_assessment (
     id SERIAL,
-    course_profile_id character (10) NOT NULL,
+    course_profile_id integer,
     assessment_name text,
     due_date timestamp,
     weighting float,
