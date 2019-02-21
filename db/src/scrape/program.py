@@ -44,7 +44,7 @@ def program(program_code):
         "abbreviation": abbreviation,
         "durationYears": durationYears,
         "units": units,
-        "plan_list": [],
+        "plans": [],
     }
 
     raw_plans = soup.find_all("a", href=re.compile("acad_plan"))
@@ -54,6 +54,6 @@ def program(program_code):
         if raw_plan.text != "Extended Major":
             plan_code = raw_plan["href"][-10:]
             title = raw_plan.text
-            program_data["plan_list"].append({"plan_code": plan_code, "title": title})
+            program_data["plans"].append({"plan_code": plan_code, "title": title})
 
     return program_data

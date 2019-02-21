@@ -126,9 +126,6 @@ class Pipeline:
         if program is None:
             return None
 
-        if res:
-            return program
-
         stmt = """
               INSERT INTO program
               VALUES (%s, %s, %s, %s, %s, %s)
@@ -145,6 +142,14 @@ class Pipeline:
                 program["units"],
             ),
         )
+
+        for plan_code in program["plans"]:
+            stmt = """
+              INSERT INTO plan_to_program
+              VALUES (%s, %s)
+              """
+
+            self._db.commit(stmt, data=(plan_code, program_code))
 
         return program
 
