@@ -4,8 +4,10 @@ Migrate
 import src.database as database
 import src.scrape as scrape
 import src.settings as settings
-from src.scrape.plan import get_plan_rules
-from src.scrape.program import get_program_course_list
+
+from src.logger import get_logger
+
+_LOG = get_logger("pipeline")
 
 
 class Pipeline:
@@ -21,11 +23,6 @@ class Pipeline:
             settings.DATABASE["PASSWORD"],
             settings.DATABASE["HOST"],
         )
-        self._logfile = None
-
-        # development use only
-        # self._dev_course_count = 0
-        # self._dev_plan_count = 0
 
     def reset(self):
         """
@@ -39,8 +36,8 @@ class Pipeline:
             return
 
         queries = [
-            "DELETE from plan_course_list",
-            "DELETE from program_course_list",
+            "DELETE from course_to_plan",
+            "DELETE from course_to_program",
             "DELETE from incompatible_courses",
             "DELETE from course_assessment",
             "DELETE from course",
@@ -56,52 +53,42 @@ class Pipeline:
         Runs the pipeline
         :return: None
         """
-        self._logfile = open("incompatible_courses.txt", "w")
+        _LOG.info("Pipeline init")
         program_list = scrape.catalogue()
-        print(program_list)
-
-        print("\n************* INITIALISING PIPELINE *************\n")
 
         for program_code in program_list:
-            print("\nLOADING PROGRAM:", program_code)
-            print("\tScraping program...")
-            program = self.add_program(program_code)
-            print("\tBuilding course list...")
-            self.add_program_course_list(program_code)
+            program = self.get_or_add_program(program_code)
+            if not program:
+                continue
 
-            if program is None:
-                return
+            program_course_list = scrape.program_course_list(program_code)
+            self.add_courses_to_program(program_code, program_course_list)
 
-            for plan in program["plan_list"]:
-                # if self._dev_plan_count > 1:
-                # return
-                # self._dev_plan_count += 1
-                print("\nLOADING PLAN:", plan["plan_code"])
+            for plan in program_course_list:
+                plan_code = plan["plan_code"]
+                plan = self.get_or_add_plan(plan_code, plan["title"])
+                if not plan:
+                    continue
 
-                print("\tScraping plan...")
-                plan = self.add_plan(plan["plan_code"], plan["title"])
-                print("\tBuilding course list... Size:",
-                      len(plan["course_list"]))
-                self.add_plan_course_list(
-                    plan["plan_code"], plan["course_list"])
+                plan_rules = scrape.plan_rules(plan_code)
+                plan_course_list = plan_rules.get("course_list", [])
+                self.add_courses_to_plan(plan["plan_code"], plan_course_list)
 
-        print("\n************* PIPELINE COMPLETE *************\n")
+        _LOG.info("Pipeline finished")
 
-    def add_program(self, program_code):
+    def get_or_add_program(self, program_code):
         """
 
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        sql = (
-            """
+        _LOG.info(f"Getting program: {program_code}")
+        stmt = """
             SELECT *
             FROM program
-            WHERE program_code = '%s'
+            WHERE program_code = (%s)
             """
-            % program_code
-        )
-        res = self._db.select(sql)
+        res = self._db.select(stmt, data=(program_code,))
 
         if res:
             program_data = {
@@ -111,13 +98,10 @@ class Pipeline:
                 "abbreviation": res[0][3],
                 "durationYears": res[0][4],
                 "units": res[0][5],
-                "plan_list": [],
-                "course_list": get_program_course_list(res[0][0]),
             }
 
             return program_data
 
-        # TODO should have a unified way to trigger refreshes
         program = scrape.program(program_code)
 
         if program is None:
@@ -126,64 +110,47 @@ class Pipeline:
         if res:
             return program
 
-        title = program["title"]
-        level = program["level"]
-        abbreviation = program["abbreviation"]
-
-        sql = """
+        stmt = """
               INSERT INTO program
-              VALUES ('%s', '%s', '%s', '%s', '%d', '%d')
-              """ % (
-            program_code,
-            program["title"],
-            program["level"],
-            program["abbreviation"],
-            program["durationYears"],
-            program["units"],
-        )
+              VALUES (%s, %s, %s, %s, %s, %s)
+              """
 
-        self._db.commit(sql)
+        self._db.commit(
+            stmt,
+            data=(
+                program_code,
+                program["title"],
+                program["level"],
+                program["abbreviation"],
+                program["durationYears"],
+                program["units"],
+            ),
+        )
 
         return program
 
-    def add_program_course_list(self, program_code):
+    def add_courses_to_program(self, program_code, courses):
         """
 
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        course_list = scrape.program_course_list(program_code)
-
-        for course_code in course_list:
-            # if self._dev_course_count > 5:
-            # return
-            # self._dev_course_count += 1
-
-            course = self.add_course(course_code)
+        for course_code in courses:
+            course = self.get_or_add_course(course_code)
             if course is None:
                 continue
 
             sql = """
-                  INSERT INTO program_course_list
-                      (course_code, program_code)
-                  SELECT '%s', '%s'
-                  WHERE NOT EXISTS (
-                      SELECT course_code
-                      FROM program_course_list
-                      WHERE course_code = '%s' AND program_code = '%s'
-                  );
-                  """ % (
-                course_code,
-                program_code,
-                course_code,
-                program_code,
-            )
+                  INSERT INTO course_to_program 
+                  VALUES (%s, %s)
+                  ON CONFLICT DO NOTHING
+                  """
 
-            self._db.commit(sql)
+            self._db.commit(sql, data=(course_code, program_code))
 
-        return course_list
+        return courses
 
-    def add_plan(self, plan_code, plan_title):
+    def get_or_add_plan(self, plan_code, plan_title):
         """
 
         :param plan_code: String, 5 letter plan key followed by 4 digit
@@ -191,175 +158,146 @@ class Pipeline:
         :param plan_title: String, plan title
         :return:
         """
+        _LOG.info(f"Getting plan: {plan_code}")
         sql = (
             """
             SELECT *
             FROM plan
-            WHERE plan_code = '%s'
+            WHERE plan_code = (%s)
             """
             % plan_code
         )
-        res = self._db.select(sql)
+        res = self._db.select(sql, data=(plan_code,))
 
         if res:
-            plan_rules = get_plan_rules(plan_code)
+            {"plan_code": res[0][0], "title": res[0][2], "program_code": res[0][1]},
 
-            return {
-                "plan_code": res[0][0],
-                "title": res[0][2],
-                "program_code": res[0][1],
-                "course_list": plan_rules["course_list"],
-                "rules": plan_rules["rules"],
-            }
-
-        plan = scrape.plan(plan_code, plan_title)
+        plan = scrape.plan(plan_code)
 
         if plan is None:
-            return None
-
-        if res:
-            return plan
+            return
 
         sql = """
               INSERT INTO plan
-              VALUES ('%s', '%s', '%s')
-              """ % (
-            plan["plan_code"],
-            plan["program_code"],
-            plan["title"],
-        )
+              VALUES (%s, %s, %s)
+              """
 
-        self._db.commit(sql)
+        self._db.commit(sql, (plan["plan_code"], plan["program_code"], plan_title))
 
         return plan
 
-    def add_plan_course_list(self, plan_code, plan_course_list):
+    def add_courses_to_plan(self, plan_code, courses):
         """
 
         :param plan_code: String, 5 letter plan key followed by 4 digit
                             program code (e.g. SOFTWX2342)
-        :param plan_course_list: List, containing Strings, all course codes
+        :param courses: List, containing Strings, all course codes
                             (e.g. CSSE1001)
         :return: None
         """
-        for course_code in plan_course_list:
-            # if self._dev_course_count > 20:
-            # return
-            # self._dev_course_count += 1
-
-            course = self.add_course(course_code)
+        for course_code in courses:
+            course = self.get_or_add_course(course_code)
             if course is None:
                 continue
 
             sql = """
-                INSERT INTO plan_course_list
-                    (course_code, plan_code)
-                SELECT '%s', '%s'
-                WHERE NOT EXISTS (
-                    SELECT course_code
-                    FROM plan_course_list
-                    WHERE course_code = '%s' AND plan_code = '%s'
-                );
-                """ % (
-                course_code,
-                plan_code,
-                course_code,
-                plan_code,
-            )
+                INSERT INTO course_to_plan
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING
+                """
 
-            self._db.commit(sql)
+            self._db.commit(sql, data=(course_code, plan_code))
 
-    def add_course(self, course_code):
+    def get_or_add_course(self, course_code):
         """
 
         :param course_code: String, 4 letters followed by 4 digits
                                 (e.g. MATH1051)
         :return:
         """
+        _LOG.info(f"Getting course: {course_code}")
 
         # Check for db entry for course. Don't scrape it if yes
         if len(course_code) != 8:
-            return None
-        sql = (
-            """
+            return
+
+        sql = """
             SELECT course_code, course_profile_id
             FROM course
-            WHERE course_code = '%s'
+            WHERE course_code = (%s)
             """
-            % course_code
-        )
-        res = self._db.select(sql)
-        print(course_code)
+
+        res = self._db.select(sql, data=(course_code,))
+
         if res:
             profile_id = res[0][1]
             if profile_id:
-                # dont need course object for anything, so just return nothing
-                self.add_course_profile(course_code, profile_id)
-            return None
+                self.refresh_course_profile(course_code, profile_id)
+            # TODO should return a course object here instead of nothing
+            return True
 
         course = scrape.course(course_code)
 
-        # # add invalid course to db
         if course is None:
-            sql = (
-                """
+            return
+
+        # flag course as invalid in DB
+        if course is False:
+            sql = """
               INSERT INTO course
-              (course_code, invalid)
-              VALUES ('%s', 'true')
+              (course_code, not_offered)
+              VALUES (%s, %s)
               """
-                % course_code
-            )
 
-            self._db.commit(sql)
-            return None
+            self._db.commit(sql, data=(course_code, True))
+            return {"course_code": course_code}
 
-        title = course.get("title", '')
+        title = course.get("title", "")
         if title:
             title = title.replace("'", "''")
 
-        description = course.get("description", '')
+        description = course.get("description", "")
         if description:
             description = description.replace("'", "''")
 
-        raw_prereqs = course.get("raw_prereqs", '')
+        raw_prereqs = course.get("raw_prereqs", "")
         if raw_prereqs:
             raw_prereqs = raw_prereqs.replace("'", "''")
 
         sql = """
               INSERT INTO course
-              VALUES ('%s', '%s', '%s', '%s', 
-              '%d', '%s', '%s', '%s', '%s', 'false')
-              """ % (
-            course["course_code"],
-            title,
-            description,
-            raw_prereqs,
-            course["units"],
-            course["course_profile_id"],
-            course["semester_offerings"][0],
-            course["semester_offerings"][1],
-            course["semester_offerings"][2],
+              VALUES (%s, %s, %s, %s, 
+              %s, %s, %s, %s, %s, %s)
+              """
+
+        self._db.commit(
+            sql,
+            data=(
+                course["course_code"],
+                title,
+                description,
+                raw_prereqs,
+                course["units"],
+                course["course_profile_id"],
+                course["semester_offerings"][0],
+                course["semester_offerings"][1],
+                course["semester_offerings"][2],
+                True,
+            ),
         )
 
-        self._db.commit(sql)
+        self.add_incompatible_courses(course_code, course["incompatible_courses"])
 
-        self.add_incompatible_courses(
-            course_code, course["incompatible_courses"])
-        return True
+        # TODO return an actual course object here
+        return {"course_code": course_code}
 
-    def add_course_profile(self, course_code, course_profile_id):
-        sql = (
+    def refresh_course_profile(self, course_code, course_profile_id):
+        _LOG.info(f"Refreshing course profile: {course_code}")
+        sql = """
+            DELETE FROM course_assessment
+            WHERE course_code = (%s)
             """
-            SELECT course_code
-            FROM course_assessment
-            WHERE course_code = '%s'
-            """
-            % course_code
-        )
-        res = self._db.select(sql)
-
-        if res:
-            return
+        self._db.commit(sql, data=(course_code,))
 
         course_profile = scrape.course_profile(course_code, course_profile_id)
 
@@ -367,19 +305,31 @@ class Pipeline:
             return
 
         for assessment in course_profile:
-            print(assessment.get("name").replace("'", "''"))
+            due_date_str = None
+            if assessment.get("due_date"):
+                due_date_str = assessment.get("due_date").isoformat()
+
             sql = """
                 INSERT INTO course_assessment (course_code, assessment_name, due_date, weighting, learning_obj)
-                VALUES ('%s', '%s', '%s', '%s', '%s')
-                """ % (
-                assessment.get("course_code"),
-                assessment.get("name").replace("'", "''"),
-                assessment.get("due_date").replace("'", "''"),
-                assessment.get("weighting"),
-                assessment.get("learning_obj"),
-            )
+                VALUES (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+                """
 
-            self._db.commit(sql)
+            self._db.commit(
+                sql,
+                data=(
+                    assessment["course_code"],
+                    assessment["name"].replace("'", "''"),
+                    due_date_str,
+                    assessment["weighting"],
+                    assessment["learning_obj"],
+                ),
+            )
 
         return course_profile
 
@@ -390,38 +340,30 @@ class Pipeline:
         :param incompatible_courses: List, course code/s as Strings
         :return:
         """
-        if incompatible_courses is None:
-            return
 
         for i_course_code in incompatible_courses:
-            if len(i_course_code) != 8:
-                self._logfile.write(course_code + "\n")
-                continue
             # Ensure all courses are added to `course` table
-            self.add_course(i_course_code)
+            course = self.get_or_add_course(i_course_code)
+            if course is None:
+                continue
 
             sql = """
                 SELECT course_code
                 FROM incompatible_courses
-                WHERE course_code = '%s'
-                AND incompatible_course_code = '%s'
-                """ % (
-                course_code,
-                i_course_code,
-            )
-            res = self._db.select(sql)
+                WHERE course_code = (%s)
+                AND incompatible_course_code = (%s)
+                """
+
+            res = self._db.select(sql, data=(course_code, i_course_code))
             if res:
                 continue
 
             sql = """
                   INSERT INTO incompatible_courses
-                  VALUES ('%s', '%s')
-                  """ % (
-                course_code,
-                i_course_code,
-            )
+                  VALUES (%s, %s)
+                  """
 
-            self._db.commit(sql)
+            self._db.commit(sql, data=(course_code, i_course_code))
 
 
 if __name__ == "__main__":

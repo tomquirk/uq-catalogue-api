@@ -18,30 +18,27 @@ class Db:
     def connect(self, dbname, username, password, host):
         """ Establishes connection with psql server
         """
-        try:
-            connect_str = "dbname='%s' user='%s' host='%s' password='%s'" % (
-                dbname,
-                username,
-                host,
-                password,
-            )
-            self._conn = psycopg2.connect(connect_str)
-            self._cursor = self._conn.cursor()
-        except Exception as error:
-            print("Error connecting to database\n", error)
+        connect_str = "dbname='%s' user='%s' host='%s' password='%s'" % (
+            dbname,
+            username,
+            host,
+            password,
+        )
+        self._conn = psycopg2.connect(connect_str)
+        self._cursor = self._conn.cursor()
 
-    def select(self, query):
+    def select(self, query, data=None):
         """ execution suitable for read queries, returning the rows returned from given query.
         """
         self.log("Exectuting " + query)
-        self._cursor.execute(query)
+        self._cursor.execute(query, data)
         return self._cursor.fetchall()
 
-    def commit(self, query):
+    def commit(self, query, data=None):
         """ execution suitable for update queries
         """
-        self.log("Exectuting " + query)
-        self._cursor.execute(query)
+        self.log("Exectuting:" + query)
+        self._cursor.execute(query, data)
         self._conn.commit()
 
     def disconnect(self):

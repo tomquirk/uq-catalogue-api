@@ -1,7 +1,26 @@
-import src.scrape.helpers as helpers
-import src.settings as settings
 import pandas as pd
 import re
+import dateparser
+
+import src.scrape.helpers as helpers
+import src.settings as settings
+
+
+def format_date(date):
+    # check if date contains no digits
+    if not any(char.isdigit() for char in date):
+        return None
+
+    dates = date.split("-")
+    if len(dates) > 1:
+        date1 = dateparser.parse(dates[0])
+        date2 = dateparser.parse(dates[1])
+        if date1 and date2:
+            if date1.date() == date2.date():
+                date = dates[0]
+                return dateparser.parse(date)
+    date = dateparser.parse(date)
+    return date
 
 
 def course_profile(course_code, course_profile_id):
@@ -9,18 +28,15 @@ def course_profile(course_code, course_profile_id):
     Scrapes a course profile
     :return: Dict Object, containing course profile details
     """
-    base_url = (
-        f"https://www.courses.uq.edu.au/student_section_loader.php?section=5&profileId={course_profile_id}"
-    )
+    base_url = f"https://www.courses.uq.edu.au/student_section_loader.php?section=5&profileId={course_profile_id}"
     try:
-        all_tables = pd.read_html(base_url, match='Assessment Task')
+        all_tables = pd.read_html(base_url, match="Assessment Task")
 
     except ValueError:
         return
     # gets tables containing desired information
     all_tables = all_tables[2:]
     for i, table in enumerate(all_tables):
-        print(table)
         if len(table.columns) != 4:
             del all_tables[i]
 
@@ -32,17 +48,16 @@ def course_profile(course_code, course_profile_id):
         while i <= table_length:
 
             name = table.at[i, 0]
-            print(splitName(name))
             due_date = table.at[i, 1]
             weighting = table.at[i, 2]
             learning_obj = table.at[i, 3]
 
             assessment = {
-                'course_code': course_code,
-                'name': splitName(name),
-                'due_date': due_date,
-                'weighting': weighting,
-                'learning_obj': learning_obj
+                "course_code": course_code,
+                "name": split_name(name),
+                "due_date": format_date(due_date),
+                "weighting": weighting,
+                "learning_obj": learning_obj,
             }
             assessments.append(assessment)
 
@@ -51,17 +66,21 @@ def course_profile(course_code, course_profile_id):
     return assessments
 
 
-def splitName(name):  # Separates assessment type from assessment name
+def split_name(name):  # Separates assessment type from assessment name
     for index, letter in enumerate(name):
         try:
-            if letter.islower() and name[index + 1].isupper() \
-                    or letter == ')' and name[index + 1].isupper():
-                return name[index+1:]
+            if (
+                letter.islower()
+                and name[index + 1].isupper()
+                or letter == ")"
+                and name[index + 1].isupper()
+            ):
+                return name[index + 1 :]
         except IndexError:
             return name
     return name
 
 
-if __name__ == '__main__':
-    x = course_profile('STAT1301', '93044')
+if __name__ == "__main__":
+    x = course_profile("STAT1301", "93044")
     print(x)

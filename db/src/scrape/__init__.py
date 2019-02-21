@@ -6,4 +6,5 @@ from .course_profile import course_profile
 from .catalogue import catalogue
 from .plan import plan
 from .program import program
-from .program import get_program_course_list as program_course_list
+from .program_course_list import program_course_list
+from .plan_rules import plan_rules

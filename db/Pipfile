@@ -11,6 +11,7 @@ lxml = "*"
 tqdm = "*"
 pandas = "*"
 html5lib = "*"
+dateparser = "*"
 
 [dev-packages]
 black = "*"
@@ -19,3 +20,6 @@ ipdb = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
