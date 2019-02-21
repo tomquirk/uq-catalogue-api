@@ -49,7 +49,10 @@ def course_profile(course_code, course_profile_id):
 
             name = table.at[i, 0]
             due_date = table.at[i, 1]
-            weighting = table.at[i, 2]
+            try:
+                weighting = int(table.at[i, 2].split("%")[0]) / 100.0
+            except Exception:
+                weighting = None
             learning_obj = table.at[i, 3]
 
             assessment = {
@@ -82,5 +85,4 @@ def split_name(name):  # Separates assessment type from assessment name
 
 
 if __name__ == "__main__":
-    x = course_profile("STAT1301", "93044")
-    print(x)
+    x = course_profile("ACCT2112", "95235")

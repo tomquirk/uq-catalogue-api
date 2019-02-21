@@ -347,7 +347,7 @@ class Pipeline:
             if len(i_course_code) == 8:
                 last_course_code_prefix = i_course_code[:4]
             if len(i_course_code) == 4:
-                i_course_code = f"{last_course_code_prefix}i_course_code"
+                i_course_code = f"{last_course_code_prefix}{i_course_code}"
             # Ensure all courses are added to `course` table
             course = self.get_or_add_course(i_course_code)
             if course is None:

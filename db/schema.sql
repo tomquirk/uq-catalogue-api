@@ -64,7 +64,7 @@ CREATE TABLE course_assessment (
     course_code character (8) NOT NULL,
     assessment_name text,
     due_date timestamp,
-    weighting text,
+    weighting float,
     learning_obj text
 );
 --
