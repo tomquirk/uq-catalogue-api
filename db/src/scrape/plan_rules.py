@@ -1,6 +1,9 @@
 import re
 import src.scrape.helpers as helpers
 import src.settings as settings
+from src.logger import get_logger
+
+_LOG = get_logger("plan_rules_scraper")
 
 
 def plan_rules(plan_code):
@@ -8,8 +11,7 @@ def plan_rules(plan_code):
     Scrapes rules and courses required for program e.g. Chemistry major
     :return:
     """
-
-    plan_rules = {"course_list": [], "rules": []}
+    _LOG.debug(f"scraping plan rules: {plan_code}")
 
     base_url = f"{settings.UQ_BASE_URL}/programs-courses/plan_display.html?acad_plan={plan_code}"
     soup = helpers.get_soup(base_url)
@@ -17,6 +19,7 @@ def plan_rules(plan_code):
     # raw_rules = soup.find_all("div", "courselist")
 
     # get courses
+    plan_rules = {"course_list": [], "rules": []}
     raw_courses = soup.find_all("a", href=re.compile("course_code"))
     for course in raw_courses:
         if not course:

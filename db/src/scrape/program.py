@@ -15,7 +15,8 @@ def program(program_code):
     :param program_code: str, program code for given program (4 digits)
     :return: Dict, program details
     """
-    _LOG.info(f"Scraping program: {program_code}")
+    _LOG.info(f"scraping program: {program_code}")
+
     url = (
         f"{settings.UQ_BASE_URL}/programs-courses/program.html?acad_prog={program_code}"
     )
@@ -54,6 +55,8 @@ def program(program_code):
         if raw_plan.text != "Extended Major":
             plan_code = raw_plan["href"][-10:]
             title = raw_plan.text
-            program_data["plans"].append({"plan_code": plan_code, "program_code": program_code, "title": title})
+            program_data["plans"].append(
+                {"plan_code": plan_code, "program_code": program_code, "title": title}
+            )
 
     return program_data

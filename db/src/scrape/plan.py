@@ -14,7 +14,8 @@ def plan(plan_code):
     Scrapes basic data for given program
     :return: None
     """
-    _LOG.info(f"Scraping plan: {plan_code}")
+    _LOG.debug(f"scraping plan: {plan_code}")
+
     base_url = (
         f"{settings.UQ_BASE_URL}/programs-courses/plan.html?acad_plan={plan_code}"
     )

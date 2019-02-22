@@ -7,8 +7,6 @@ from src.logger import get_logger
 
 _LOG = get_logger("course_scraper")
 
-COURSE_REGEX = "/([A-Z]){4}([0-9]){4}/"
-
 
 def course(course_code):
     """
@@ -16,7 +14,8 @@ def course(course_code):
     given course
     :return: Dict Object, containing course details, False if not offerred, None if not a course
     """
-    _LOG.info(f"Scraping course: {course_code}")
+    _LOG.debug(f"scraping course: {course_code}")
+
     base_url = (
         f"{settings.UQ_BASE_URL}/programs-courses/course.html?course_code={course_code}"
     )

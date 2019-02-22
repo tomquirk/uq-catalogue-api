@@ -4,6 +4,9 @@ import dateparser
 
 import src.scrape.helpers as helpers
 import src.settings as settings
+from src.logger import get_logger
+
+_LOG = get_logger("course_profile_scraper")
 
 
 def format_date(date):
@@ -28,6 +31,8 @@ def course_profile(course_code, course_profile_id):
     Scrapes a course profile
     :return: Dict Object, containing course profile details
     """
+    _LOG.debug(f"scraping course profile: ${course_code}-${course_profile_id}")
+
     base_url = f"https://www.courses.uq.edu.au/student_section_loader.php?section=5&profileId={course_profile_id}"
     try:
         all_tables = pd.read_html(base_url, match="Assessment Task")

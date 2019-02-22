@@ -1,11 +1,14 @@
 """
 Migrate
 """
+import re
+
 import src.database as database
 import src.scrape as scrape
 import src.settings as settings
 
 from src.logger import get_logger
+from src.util import is_course_code, is_plan_code, is_program_code
 
 _LOG = get_logger("pipeline")
 
@@ -20,7 +23,7 @@ class Pipeline:
     """
 
     def __init__(self):
-        self._db = database.Db(detailed=False)
+        self._db = database.Db()
         self._db.connect(
             settings.DATABASE["NAME"],
             settings.DATABASE["USER"],
@@ -58,10 +61,12 @@ class Pipeline:
         Runs the pipeline
         :return: None
         """
-        _LOG.info("Pipeline init")
-        program_list = scrape.catalogue()
-        print(program_list)
-        for program_code in program_list:
+        _LOG.info("pipeline init")
+
+        programs = scrape.programs()
+        _LOG.info(f"{len(programs)} programs found")
+
+        for program_code in programs:
             program = self.get_or_add_program(program_code)
             if not program:
                 continue
@@ -81,7 +86,7 @@ class Pipeline:
                 plan_course_list = plan_rules.get("course_list", [])
                 self.add_courses_to_plan(plan["plan_code"], plan_course_list)
 
-        _LOG.info("Pipeline finished")
+        _LOG.info("pipeline finished")
 
     def get_or_add_program(self, program_code):
         """
@@ -89,7 +94,7 @@ class Pipeline:
         :param program_code: String, 4 digit code of desired program
         :return:
         """
-        _LOG.info(f"Getting program: {program_code}")
+        _LOG.info(f"getting program: {program_code}")
         stmt = """
             SELECT *
             FROM program
@@ -150,6 +155,8 @@ class Pipeline:
         :param program_code: String, 4 digit code of desired program
         :return:
         """
+        _LOG.info(f"adding {len(courses)} courses to program: {program_code}")
+
         for course_code in courses:
             course = self.get_or_add_course(course_code)
             if course is None:
@@ -207,6 +214,8 @@ class Pipeline:
                             (e.g. CSSE1001)
         :return: None
         """
+        _LOG.info(f"adding {len(courses)} courses to plan: {plan_code}")
+
         for course_code in courses:
             course = self.get_or_add_course(course_code)
             if course is None:
@@ -227,9 +236,9 @@ class Pipeline:
                                 (e.g. MATH1051)
         :return:
         """
-        _LOG.info(f"Getting course: {course_code}")
+        _LOG.info(f"getting course: {course_code}")
 
-        if len(course_code) != 8:
+        if not is_course_code(course_code):
             return
 
         sql = """
@@ -242,7 +251,7 @@ class Pipeline:
 
         if res:
             # Could scrape course profile here, but
-            # probably safe to assume we've got it
+            # probably safe to assume we've already got it
             return {"course_code": course_code}
 
         course = scrape.course(course_code)
@@ -303,7 +312,11 @@ class Pipeline:
         return {"course_code": course_code}
 
     def refresh_course_profile(self, course_code, course_profile_id):
-        _LOG.info(f"Refreshing course profile: {course_code}")
+        _LOG.info(f"refreshing course profile: {course_code}")
+
+        if not is_course_code(course_code):
+            return
+
         sql = """
             DELETE FROM course_profile
             WHERE course_code = (%s)
@@ -363,16 +376,23 @@ class Pipeline:
         :return:
         """
         _LOG.info(
-            f"Flagging incompatible courses: {course_code} <=/=> {str(incompatible_courses)}"
+            f"flagging incompatible courses: {course_code} <=/=> {str(incompatible_courses)}"
         )
+
         last_course_code_prefix = None
 
+        # some incompatible course lists are presented like
+        # CSSE1001, 2002, 4004. They really mean, CSSE1001, CSSE2002, etc.
+        # So, iterate the (assumed) ordered list and resolve
         for i_course_code in incompatible_courses:
-            if len(i_course_code) == 8:
+            if is_course_code(i_course_code):
                 last_course_code_prefix = i_course_code[:4]
-            if len(i_course_code) == 4:
+            elif re.fullmatch("[0-9]{4}", i_course_code):
                 i_course_code = f"{last_course_code_prefix}{i_course_code}"
-            # Ensure all courses are added to `course` table
+                # double check
+                if not is_course_code(i_course_code):
+                    continue
+
             course = self.get_or_add_course(i_course_code)
             if course is None:
                 continue

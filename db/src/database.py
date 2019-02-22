@@ -3,6 +3,9 @@ Database Utility
 """
 
 import psycopg2
+from src.logger import get_logger
+
+_LOG = get_logger("database")
 
 
 class Db:
@@ -10,10 +13,9 @@ class Db:
     Mini wrapper for database interaction
     """
 
-    def __init__(self, detailed):
+    def __init__(self):
         self._conn = None
         self._cursor = None
-        self._detailed = detailed
 
     def connect(self, dbname, username, password, host):
         """ Establishes connection with psql server
@@ -30,14 +32,14 @@ class Db:
     def select(self, query, data=None):
         """ execution suitable for read queries, returning the rows returned from given query.
         """
-        self.log("Exectuting " + query)
+        _LOG.debug(f"exectuting:{query}")
         self._cursor.execute(query, data)
         return self._cursor.fetchall()
 
     def commit(self, query, data=None):
         """ execution suitable for update queries
         """
-        self.log("Exectuting:" + query)
+        _LOG.debug("exectuting:{query}")
         self._cursor.execute(query, data)
         self._conn.commit()
 
@@ -46,8 +48,3 @@ class Db:
         """
         self._conn.close()
 
-    def log(self, log):
-        """stdout wrapper
-        """
-        if self._detailed:
-            print(log)
