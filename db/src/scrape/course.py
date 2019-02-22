@@ -7,6 +7,8 @@ from src.logger import get_logger
 
 _LOG = get_logger("course_scraper")
 
+COURSE_REGEX = "/([A-Z]){4}([0-9]){4}/"
+
 
 def course(course_code):
     """
@@ -46,9 +48,8 @@ def course(course_code):
     except Exception:
         pass
 
-    raw_units = soup.find(id="course-units").get_text()
-
     try:
+        raw_units = soup.find(id="course-units").get_text()
         units = int(raw_units)
     except TypeError:
         return False

@@ -54,6 +54,6 @@ def program(program_code):
         if raw_plan.text != "Extended Major":
             plan_code = raw_plan["href"][-10:]
             title = raw_plan.text
-            program_data["plans"].append({"plan_code": plan_code, "title": title})
+            program_data["plans"].append({"plan_code": plan_code, "program_code": program_code, "title": title})
 
     return program_data

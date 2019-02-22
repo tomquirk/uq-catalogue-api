@@ -11,7 +11,7 @@ _LOG = get_logger("pipeline")
 
 
 def to_plan(sql_res):
-    return ({"plan_code": sql_res[0], "title": sql_res[2], "program_code": sql_res[1]},)
+    return {"plan_code": sql_res[0], "title": sql_res[2], "program_code": sql_res[1]}
 
 
 class Pipeline:
@@ -60,7 +60,7 @@ class Pipeline:
         """
         _LOG.info("Pipeline init")
         program_list = scrape.catalogue()
-
+        print(program_list)
         for program_code in program_list:
             program = self.get_or_add_program(program_code)
             if not program:
@@ -174,14 +174,11 @@ class Pipeline:
         :return:
         """
         _LOG.info(f"Getting plan: {plan_code}")
-        sql = (
-            """
+        sql = """
             SELECT *
             FROM plan
             WHERE plan_code = (%s)
             """
-            % plan_code
-        )
         res = self._db.select(sql, data=(plan_code,))
 
         if res:
