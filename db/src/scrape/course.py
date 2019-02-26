@@ -1,7 +1,7 @@
 """
 Course scraper
 """
-import src.scrape.helpers as helpers
+import src.scrape.util.helpers as helpers
 import src.settings as settings
 from src.logger import get_logger
 

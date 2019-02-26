@@ -74,6 +74,9 @@ class Pipeline:
             program_course_list = scrape.program_course_list(program_code)
             self.add_courses_to_program(program_code, program_course_list)
 
+            _LOG.info(
+                f"{len(programs)} plans found for program: {len(program['plans'])}"
+            )
             for plan in program["plans"]:
                 plan_code = plan["plan_code"]
                 plan = self.get_or_add_plan(
@@ -180,7 +183,7 @@ class Pipeline:
         :param plan_title: String, plan title
         :return:
         """
-        _LOG.info(f"Getting plan: {plan_code}")
+        _LOG.info(f"getting plan: {plan_code}")
         sql = """
             SELECT *
             FROM plan

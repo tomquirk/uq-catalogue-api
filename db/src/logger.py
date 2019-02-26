@@ -1,4 +1,5 @@
 import logging
+import src.settings as settings
 
 _LOGGING_CONFIGURED = False
 
@@ -11,6 +12,7 @@ def get_logger(name):
     """
     global _LOGGING_CONFIGURED
     if not _LOGGING_CONFIGURED:
-        logging.basicConfig(level=logging.INFO)
+        level = logging.DEBUG if settings.ENVIRONMENT == "development" else logging.INFO
+        logging.basicConfig(level=level)
         _LOGGING_CONFIGURED = True
     return logging.getLogger(name)

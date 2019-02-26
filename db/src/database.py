@@ -32,14 +32,14 @@ class Db:
     def select(self, query, data=None):
         """ execution suitable for read queries, returning the rows returned from given query.
         """
-        _LOG.debug(f"exectuting:{query}")
+        # _LOG.debug(f"exectuting:{query}")
         self._cursor.execute(query, data)
         return self._cursor.fetchall()
 
     def commit(self, query, data=None):
         """ execution suitable for update queries
         """
-        _LOG.debug("exectuting:{query}")
+        # _LOG.debug(f"exectuting:{query}")
         self._cursor.execute(query, data)
         self._conn.commit()
 

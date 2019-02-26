@@ -1,1 +1,2 @@
 db/test/data/* linguist-detectable=false
+db/src/scrape/cache/* linguist-detectable=false

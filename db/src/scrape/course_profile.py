@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import dateparser
 
-import src.scrape.helpers as helpers
+import src.scrape.util.helpers as helpers
 import src.settings as settings
 from src.logger import get_logger
 
@@ -10,8 +10,9 @@ _LOG = get_logger("course_profile_scraper")
 
 
 def format_date(date):
+    _LOG.debug(f"format_date: {date}")
     # check if date contains no digits
-    if not any(char.isdigit() for char in date):
+    if not date or isinstance(date, str) and not any(char.isdigit() for char in date):
         return None
 
     dates = date.split("-")

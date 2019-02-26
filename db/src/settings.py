@@ -9,8 +9,9 @@ DATABASE = {
 }
 
 UQ_BASE_URL = "https://my.uq.edu.au"
-ENV = os.getenv("ENV_NAME", "development")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 PROGRAMS_WHITELIST = []
+SCRAPE_CACHE_ROOT = 'src/scrape/cache'
 # PROGRAMS_WHITELIST = [
 #     "2366",
 #     "2032",

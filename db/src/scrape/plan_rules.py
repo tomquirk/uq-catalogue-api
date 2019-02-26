@@ -1,5 +1,6 @@
 import re
-import src.scrape.helpers as helpers
+import src.scrape.util.helpers as helpers
+import src.scrape.util.cache as cache
 import src.settings as settings
 from src.logger import get_logger
 
@@ -11,6 +12,12 @@ def plan_rules(plan_code):
     Scrapes rules and courses required for program e.g. Chemistry major
     :return:
     """
+    cache_id = f"plan_rules:{plan_code}"
+    cached = cache.get(cache_id)
+    if cached:
+        _LOG.debug(f"using cached plan rules: {plan_code}")
+        return cached
+
     _LOG.debug(f"scraping plan rules: {plan_code}")
 
     base_url = f"{settings.UQ_BASE_URL}/programs-courses/plan_display.html?acad_plan={plan_code}"
@@ -41,5 +48,5 @@ def plan_rules(plan_code):
 
     #     if len(rule['text']) != 0 and len(rule['courses']) != 0:
     #         plan_rules['rules'].append(rule)
-
+    cache.set(cache_id, plan_rules)
     return plan_rules
