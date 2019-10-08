@@ -3,6 +3,7 @@ Plan scraper
 """
 import re
 import src.scrape.util.helpers as helpers
+import src.scrape.util.cache as cache
 import src.settings as settings
 from src.logger import get_logger
 
@@ -14,6 +15,12 @@ def plan(plan_code):
     Scrapes basic data for given program
     :return: None
     """
+    cache_id = f"plan:{plan_code}"
+    cached = cache.get(cache_id)
+    if cached:
+        _LOG.debug(f"using cached plan: {plan_code}")
+        return cached
+
     _LOG.debug(f"scraping plan: {plan_code}")
 
     base_url = (

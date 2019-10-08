@@ -4,6 +4,8 @@ Course scraper
 import src.scrape.util.helpers as helpers
 import src.settings as settings
 from src.logger import get_logger
+from src.scrape.util.cache import get_html, set_html
+import re
 
 _LOG = get_logger("course_scraper")
 
@@ -16,10 +18,14 @@ def course(course_code):
     """
     _LOG.debug(f"scraping course: {course_code}")
 
-    base_url = (
-        f"{settings.UQ_BASE_URL}/programs-courses/course.html?course_code={course_code}"
-    )
-    soup = helpers.get_soup(base_url)
+    cache_id = f'course:{course_code}'
+    soup = get_html(cache_id)
+    if not soup:
+        base_url = (
+            f"{settings.UQ_BASE_URL}/programs-courses/course.html?course_code={course_code}"
+        )
+        soup = helpers.get_soup(base_url)
+        set_html(cache_id, str(soup))
 
     if soup is None or soup.find(id="course-notfound"):
         return
@@ -37,7 +43,8 @@ def course(course_code):
             course_summary = course_summary.split("\n")[0]
 
     try:
-        parent_description_elem = soup.find(id="description").contents[1].get_text()
+        parent_description_elem = soup.find(
+            id="description").contents[1].get_text()
         not_offered_match = (
             "This course is not currently offered, please contact the school."
         )
@@ -50,7 +57,7 @@ def course(course_code):
     try:
         raw_units = soup.find(id="course-units").get_text()
         units = int(raw_units)
-    except TypeError:
+    except (TypeError, AttributeError):
         return False
 
     if units < 1:
@@ -100,9 +107,22 @@ def course(course_code):
     if "Summer Semester, " in raw_semester_offerings:
         course["semester_offerings"][2] = "true"
     try:
-        course["course_profile_id"] = soup.find(class_="profile-available")[
-            "href"
-        ].split("=")[-1]
+        # import ipdb; ipdb.set_trace()
+        course_profile_id_elm = soup.find_all(id="course-offering-2-profile")
+        print(course_profile_id_elm)
+        if course_profile_id_elm:
+            course_profile_id_href = str(
+                course_profile_id_elm[0].find("a", recursive=False)['href'])
+            #profileID = course_profile_id_href.split('/')[-1]
+            profileID = course_profile_id_href[-5:]
+
+        else:
+            profileID = None
+
+        # print(course_profile_id_href)
+        # print(profileID)
+        course["course_profile_id"] = profileID
+        # print(course["course_profile_id"])
     except TypeError:
         course["course_profile_id"] = 0
 

@@ -16,10 +16,12 @@ def program(program_code):
     :return: Dict, program details
     """
     _LOG.info(f"scraping program: {program_code}")
-
+    # https://my.uq.edu.au/programs-courses/course.html?course_code=csse1001
+    print('program code: ', program_code)
     url = (
         f"{settings.UQ_BASE_URL}/programs-courses/program.html?acad_prog={program_code}"
     )
+    print('url: ', url)
     soup = helpers.get_soup(url)
 
     program_title = soup.find(id="program-title")
