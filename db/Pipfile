@@ -5,13 +5,13 @@ name = "pypi"
 
 [packages]
 "beautifulsoup4" = "*"
-"psycopg2" = "*"
 requests = "*"
 lxml = "*"
 tqdm = "*"
 pandas = "*"
 html5lib = "*"
 dateparser = "*"
+psycopg2 = "==2.8.0"
 
 [dev-packages]
 black = "*"
