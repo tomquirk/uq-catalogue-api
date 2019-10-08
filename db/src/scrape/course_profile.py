@@ -32,7 +32,7 @@ def course_profile(course_code, course_profile_id):
     Scrapes a course profile
     :return: Dict Object, containing course profile details
     """
-    _LOG.debug(f"scraping course profile: ${course_code}-${course_profile_id}")
+    _LOG.debug(f"scraping course profile: {course_code} (cp={course_profile_id})")
 
     base_url = f"https://www.courses.uq.edu.au/student_section_loader.php?section=5&profileId={course_profile_id}"
     try:
