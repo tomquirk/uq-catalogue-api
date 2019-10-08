@@ -31,3 +31,5 @@ SCRAPE_CACHE_ROOT = 'src/scrape/cache'
 #     "2388",
 #     "2419",
 # ]  # list of program codes (str)
+if not os.path.exists(SCRAPE_CACHE_ROOT):
+    os.mkdir(SCRAPE_CACHE_ROOT)
