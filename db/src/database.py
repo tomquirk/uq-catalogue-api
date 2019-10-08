@@ -40,6 +40,7 @@ class Db:
         """ execution suitable for update queries
         """
         # _LOG.debug(f"exectuting:{query}")
+        print(query)
         self._cursor.execute(query, data)
         self._conn.commit()
 

@@ -7,6 +7,10 @@ DATABASE = {
     "HOST": os.getenv("DATABASE_HOST", "127.0.0.1"),
     "PORT": os.getenv("DATABASE_PORT", "5432"),
 }
+print(DATABASE["NAME"])
+print(DATABASE["USER"])
+print(DATABASE["PASSWORD"])
+print(DATABASE["HOST"])
 
 UQ_BASE_URL = "https://my.uq.edu.au"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")

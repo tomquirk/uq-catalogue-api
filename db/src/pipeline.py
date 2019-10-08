@@ -6,6 +6,7 @@ import re
 import src.database as database
 import src.scrape as scrape
 import src.settings as settings
+from src.scrape.course_profile import format_date
 
 from src.logger import get_logger
 from src.util import is_course_code, is_plan_code, is_program_code
@@ -204,7 +205,8 @@ class Pipeline:
               VALUES (%s, %s, %s)
               """
 
-        self._db.commit(sql, (plan["plan_code"], plan["program_code"], plan_title))
+        self._db.commit(
+            sql, (plan["plan_code"], plan["program_code"], plan_title))
 
         return plan
 
@@ -306,7 +308,8 @@ class Pipeline:
             ),
         )
 
-        self.add_incompatible_courses(course_code, course["incompatible_courses"])
+        self.add_incompatible_courses(
+            course_code, course["incompatible_courses"])
 
         course_profile_id = course["course_profile_id"]
         if course_profile_id:
@@ -316,7 +319,7 @@ class Pipeline:
 
     def refresh_course_profile(self, course_code, course_profile_id):
         _LOG.info(f"refreshing course profile: {course_code}")
-
+        print('PROFILE ID', course_profile_id)
         if not is_course_code(course_code):
             return
 
@@ -343,13 +346,14 @@ class Pipeline:
         self._db.commit(sql, data=(course_profile_id, course_code))
 
         for assessment in course_profile:
-            due_date_str = None
-            if assessment.get("due_date"):
-                due_date_str = assessment.get("due_date").isoformat()
+            due_date_raw = assessment.get("due_date", "")
+            due_date = format_date(due_date_raw)
+            due_date_iso = due_date.isoformat() if due_date else None
 
             sql = """
-                INSERT INTO course_assessment (course_profile_id, assessment_name, due_date, weighting, learning_obj)
+                INSERT INTO course_assessment (course_profile_id, assessment_name, due_date, due_date_datetime, weighting, learning_obj)
                 VALUES (
+                    %s,
                     %s,
                     %s,
                     %s,
@@ -357,13 +361,13 @@ class Pipeline:
                     %s
                 )
                 """
-
             self._db.commit(
                 sql,
                 data=(
                     course_profile_id,
-                    assessment["name"].replace("'", "''"),
-                    due_date_str,
+                    assessment.get("name").replace("'", "''"),
+                    due_date_raw,
+                    due_date_iso,
                     assessment["weighting"],
                     assessment["learning_obj"],
                 ),
