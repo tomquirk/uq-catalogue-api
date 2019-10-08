@@ -308,7 +308,7 @@ class Pipeline:
 
         self.add_incompatible_courses(course_code, course["incompatible_courses"])
 
-        course_profile_id = course["course_profile_id"]
+        course_profile_url = course["course_profile_id"]
         if course_profile_id:
             self.refresh_course_profile(course_code, course_profile_id)
 

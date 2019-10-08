@@ -18,7 +18,7 @@ def programs():
 
     programs = []
 
-    url = "https://future-students.uq.edu.au/study/find-a-program/listing/undergraduate"
+    url = f"{settings.UQ_FUTURE_BASE_URL}/study/find-a-program/listing/undergraduate"
     soup = helpers.get_soup(url)
 
     raw_programs = soup.find_all("a", href=re.compile("/study/program"))

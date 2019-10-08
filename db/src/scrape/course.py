@@ -102,7 +102,7 @@ def course(course_code):
     try:
         course["course_profile_id"] = soup.find(class_="profile-available")[
             "href"
-        ].split("=")[-1]
+        ].split("/")[-1]
     except TypeError:
         course["course_profile_id"] = 0
 
