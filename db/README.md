@@ -24,7 +24,7 @@ $ psql uq_catalogue < db/schema.sql
 2.2. Create a virtualenv with [Pipenv](https://github.com/pypa/pipenv) (_preferred_):
 
 ```bash
-$ pipenv install --dev
+$ pipenv install --dev --sequential
 ```
 
 2.3. Activate virtual env

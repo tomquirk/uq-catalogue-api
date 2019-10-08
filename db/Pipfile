@@ -12,6 +12,7 @@ pandas = "*"
 html5lib = "*"
 dateparser = "*"
 psycopg2-binary = "*"
+regex = "*"
 
 [dev-packages]
 black = "*"
