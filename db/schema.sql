@@ -67,7 +67,8 @@ CREATE TABLE course_assessment (
     id SERIAL,
     course_profile_id integer,
     assessment_name text,
-    due_date timestamp,
+    due_date text,
+    due_date_datetime timestamp,
     weighting float,
     learning_obj text
 );
